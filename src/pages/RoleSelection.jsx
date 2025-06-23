@@ -8,8 +8,8 @@ const RoleSelection = () => {
   const navigate = useNavigate();
 
  const handleSelect = (role) => {
-  const url = `${window.location.origin}/login?role=${role}`;
-  window.open(url, '_blank'); // opens in a new tab
+  const url = `${window.location.origin}/${role}/login`;
+  window.open(url, '_blank');
 };
 
 
