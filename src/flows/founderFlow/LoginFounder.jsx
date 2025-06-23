@@ -11,7 +11,7 @@ const LoginFounder = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    navigate('/founder/account-setup');
+    navigate('/founder/dashboard');
   };
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);

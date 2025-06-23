@@ -2,10 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  @apply font-sans;
+}
+
 /* Input Field Utility */
 .input {
-  @apply w-full px-4 py-2 border-2 border-primary rounded-[14px] outline-none focus:ring-2 focus:ring-primary bg-white;
+  @apply w-full px-4 py-2 border-2 border-primary rounded-[14px] outline-none focus:ring-2 focus:ring-primary bg-white text-black;
 }
+
 
 /* Hide scrollbar but allow scrolling */
 .scrollbar-hidden::-webkit-scrollbar {
@@ -74,4 +79,5 @@
   .animate-pulse-slow {
     animation: pulse-slow 1.8s ease-in-out infinite;
   }
+  
 }

@@ -16,7 +16,7 @@ const Step3_SocialLinks = () => {
 
   const handleSubmit = (values) => {
     console.log('Final Step Data:', values);
-    navigate('/founder/dashboard');
+    navigate('/founder/login');
   };
 
   return (

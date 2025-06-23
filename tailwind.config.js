@@ -11,6 +11,9 @@ module.exports = {
       borderRadius: {
         xl2: '18px', // 🎯 Custom rounded radius
       },
+       fontFamily: {
+        sans: ['Poppins', 'sans-serif'], // ✅ Add this
+      },
     },
   },
   plugins: [],

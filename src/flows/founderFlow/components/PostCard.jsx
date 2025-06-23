@@ -16,7 +16,7 @@ const PostCard = ({ post }) => {
     const shareData = {
       title: post.title,
       text: post.description,
-      url: window.location.href, // Or `${window.location.origin}/posts/${post.id}` if you use routing
+      url: window.location.href,
     };
 
     try {
@@ -32,19 +32,20 @@ const PostCard = ({ post }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg mb-6 p-6 transition hover:shadow-xl duration-300 border border-purple-100">
+    <div className="bg-white rounded-2xl shadow-lg mb-6 p-6 border border-purple-100 transition hover:shadow-xl duration-300">
+      
       {/* User Info */}
       <div className="flex items-center mb-4">
         <img
           src={post.avatar}
           alt={post.name}
-          className="w-11 h-11 rounded-full ring-2 ring-purple-200 shadow-sm mr-3"
+          className="w-11 h-11 rounded-full ring-2 ring-purple-200 mr-3 object-cover"
         />
         <div>
           <p className="font-semibold text-primary">{post.name}</p>
           <p className="text-xs text-gray-500">{post.time}</p>
         </div>
-        <button className="ml-auto text-primary text-sm font-semibold hover:underline transition">
+        <button className="ml-auto text-primary text-sm font-semibold hover:underline">
           + Follow
         </button>
       </div>
@@ -53,51 +54,53 @@ const PostCard = ({ post }) => {
       <h3 className="text-lg font-bold text-gray-800 mb-2">{post.title}</h3>
 
       {/* Description */}
-      <p className="text-sm text-gray-600 mb-4 leading-relaxed">{post.description}</p>
+      <p className="text-sm text-gray-600 leading-relaxed mb-4">{post.description}</p>
 
-      {/* Tags */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {post.tags.map((tag, idx) => (
-          <span
-            key={idx}
-            className="bg-purple-100 text-primary text-xs px-3 py-1 rounded-full font-medium"
-          >
-            #{tag}
-          </span>
-        ))}
-      </div>
-
-      {/* Image */}
-      {post.image && (
-        <div className="rounded-xl overflow-hidden mb-4 border border-purple-100">
-          <img
-            src={post.image}
-            alt="Post"
-            className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
-          />
+      {/* Funding */}
+      {post.funding && (
+        <div className="flex items-center gap-2 text-sm font-medium text-purple-700 bg-purple-50 px-4 py-2 rounded-xl mb-4 w-fit">
+          <FiTrendingUp className="text-lg" />
+          Funding Goal: ₹{post.funding}
         </div>
       )}
 
+      {/* Tags */}
+      {post.tags?.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {post.tags.map((tag, idx) => (
+            <span
+              key={idx}
+              className="bg-purple-100 text-primary text-xs px-3 py-1 rounded-full font-medium"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Image */}
+      {post.image && (
+        <img
+          src={post.image}
+          alt="Idea Attachment"
+          className="mt-2 rounded-xl w-full max-h-[400px] object-cover"
+        />
+      )}
+
       {/* Actions */}
-      <div className="flex justify-between items-center pt-3 border-t border-purple-100 text-sm text-primary">
-        {/* Like */}
+      <div className="flex justify-between items-center pt-4 mt-4 border-t border-purple-100 text-sm text-primary">
         <button
           onClick={toggleLike}
-          className="flex items-center gap-1 font-medium hover:text-primary transition"
+          className="flex items-center gap-1 font-medium hover:text-primary"
         >
-          <span className="text-lg transition-transform transform hover:scale-110">
+          <span className="text-lg transition-transform hover:scale-110">
             {liked ? <FaThumbsUp className="text-primary" /> : <FiThumbsUp />}
           </span>
           Like
         </button>
 
-        {/* Comment */}
         <ActionButton icon={<FiMessageCircle />} label="Comment" />
-
-        {/* Share with Functionality */}
         <ActionButton icon={<FiShare2 />} label="Share" onClick={handleShare} />
-
-        {/* Invest */}
         <ActionButton icon={<FiTrendingUp />} label="Invest" />
       </div>
     </div>
@@ -107,7 +110,7 @@ const PostCard = ({ post }) => {
 const ActionButton = ({ icon, label, onClick }) => (
   <button
     onClick={onClick}
-    className="flex items-center gap-1 group hover:text-primary transition font-medium"
+    className="flex items-center gap-1 font-medium hover:text-primary transition"
   >
     <span className="text-lg group-hover:scale-110 transition-transform">{icon}</span>
     {label}
