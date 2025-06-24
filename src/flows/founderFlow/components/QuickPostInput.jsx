@@ -5,14 +5,27 @@ import IdeaModal from '../dashboard/pages/IdeaModal';
 const QuickPostInput = ({ onPost }) => {
   const [showModal, setShowModal] = useState(false);
 
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+  const handlePost = (idea) => {
+  const normalized = {
+    ...idea,
+    image: idea.image, // coming from IdeaModal
+    timeAgo: 'Just now',
+    user: {
+      name: 'Jane Doe',
+      avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+    },
+  };
+
+  onPost(normalized);
+  setShowModal(false);
+};
+
 
   return (
     <>
       <div className="bg-white p-5 rounded-2xl shadow-md border border-purple-200">
         <div
-          onClick={openModal}
+          onClick={() => setShowModal(true)}
           className="flex items-center gap-3 cursor-pointer hover:bg-purple-50 transition-colors border border-purple-300 rounded-full px-4 py-2"
         >
           <img
@@ -26,19 +39,17 @@ const QuickPostInput = ({ onPost }) => {
         </div>
 
         <div className="flex justify-between mt-6 px-6 text-sm text-purple-700">
-          <button className="flex items-center gap-2 hover:text-purple-900 transition-colors">
-            <FiMic /> Audio
-          </button>
-          <button className="flex items-center gap-2 hover:text-purple-900 transition-colors">
-            <FiVideo /> Video
-          </button>
-          <button className="flex items-center gap-2 hover:text-purple-900 transition-colors">
-            <FiImage /> Image
-          </button>
+          <button className="flex items-center gap-2 hover:text-purple-900 transition-colors"><FiMic /> Audio</button>
+          <button className="flex items-center gap-2 hover:text-purple-900 transition-colors"><FiVideo /> Video</button>
+          <button className="flex items-center gap-2 hover:text-purple-900 transition-colors"><FiImage /> Image</button>
         </div>
       </div>
 
-      {showModal && <IdeaModal onClose={closeModal} onPost={onPost} />}
+      <IdeaModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onPost={handlePost}
+      />
     </>
   );
 };

@@ -38,7 +38,6 @@ const Sidebar = () => {
               key={idx}
               onClick={item.onClick}
               className="group relative flex items-center justify-center text-[22px] w-10 h-10 text-primary/70 hover:text-primary transition"
-              title={item.label}
             >
               {item.icon}
               <span className="absolute left-12 bg-primary text-white text-xs font-medium px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
@@ -66,7 +65,8 @@ const Sidebar = () => {
         })}
       </aside>
 
-      {showModal && <IdeaModal onClose={() => setShowModal(false)} />}
+      <IdeaModal isOpen={showModal} onClose={() => setShowModal(false)} />
+
     </>
   );
 };
