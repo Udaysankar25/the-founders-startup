@@ -11,7 +11,7 @@ const FounderDashboard = () => {
       {/* Post Feed */}
       <div className="mt-6 space-y-6">
         <PostCard />
-        <PostCard />
+        {/* <PostCard /> */}
       </div>
     </DashboardLayout>
   );

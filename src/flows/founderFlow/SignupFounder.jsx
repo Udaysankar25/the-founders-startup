@@ -10,7 +10,8 @@ const SignupFounder = () => {
 
   const handleSignup = (e) => {
     e.preventDefault();
-    navigate('/founder/account-setup');
+    navigate('/founder/verify-email', { state: { email: 'your@email.com' } });
+
   };
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import bg from '../../assets/images/bg-auth.png';
+import { Link } from 'react-router-dom';
 
 const LoginFounder = () => {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ rounded-b-[24px] lg:rounded-tr-none lg:rounded-br-none lg:rounded-tl-[24px] lg:r
                   <input type="checkbox" />
                   <span>Remember Me</span>
                 </label>
-                <a href="#" className="font-medium">Forgot password?</a>
+                <Link to="/founder/forgot-password" className="font-medium">Forgot password?</Link>
               </div>
 
               {/* Login Button */}

@@ -9,6 +9,11 @@ import Step1_ProfileBasics from './flows/founderFlow/Step1_ProfileBasics';
 import Step2_InterestAreas from './flows/founderFlow/Step2_InterestAreas';
 import Step3_SocialLinks from './flows/founderFlow/Step3_SocialLinks';
 import DashboardLayout from './flows/founderFlow/dashboard/DashboardLayout';
+import ForgotPassword from './flows/founderFlow/ForgotPassword';
+import VerifyCode from './flows/founderFlow/VerifyCode';
+import SetNewPassword from './flows/founderFlow/SetNewPassword';
+import ResetSuccess from './flows/founderFlow/ResetSuccess';
+import VerifyEmail from './flows/founderFlow/VerifyEmail';
 
 import HomePage from './flows/founderFlow/dashboard/pages/HomePage';
 import TeamsPage from './flows/founderFlow/dashboard/pages/TeamsPage';
@@ -35,6 +40,12 @@ function App() {
         <Route path="/founder/onboarding/step-1" element={<Step1_ProfileBasics />} />
         <Route path="/founder/onboarding/step-2" element={<Step2_InterestAreas />} />
         <Route path="/founder/onboarding/step-3" element={<Step3_SocialLinks />} />
+        <Route path="/founder/forgot-password" element={<ForgotPassword />} />
+        <Route path="/founder/verify-code" element={<VerifyCode />} />
+        <Route path="/founder/reset-password" element={<SetNewPassword />} />
+        <Route path="/founder/reset-success" element={<ResetSuccess />} />
+        <Route path="/founder/verify-email" element={<VerifyEmail />} />
+
 
         {/* Founder Dashboard with nested pages */}
         <Route path="/founder/dashboard" element={<DashboardLayout />}>
