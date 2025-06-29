@@ -25,6 +25,14 @@ import ProfilePage from './flows/founderFlow/dashboard/pages/ProfilePage';
 import SignupInvestor from './flows/investorFlow/SignupInvestor';
 import LoginInvestor from './flows/investorFlow/LoginInvestor';
 import AccountSetupInvestor from './flows/investorFlow/AccountSetupInvestor';
+import InvestorAbout from './flows/investorFlow/InvestorAbout';
+import ForgotPasswordInvestor from './flows/investorFlow/ForgotPasswordInvestor';
+import VerifyCodeInvestor from './flows/investorFlow/VerifyCodeInvestor';
+import SetNewPasswordInvestor from './flows/investorFlow/SetNewPasswordInvestor';
+import VerifyEmailInvestor from './flows/investorFlow/VerifyEmailInvestor';
+import InvestorStep3_SocialLinks from './flows/investorFlow/InvestorStep3_SocialLinks'; // Uncomment if needed
+import InvestorStep2_InterestAreas from './flows/investorFlow/InvestorStep2_InterestAreas';
+
 
 function App() {
   return (
@@ -60,6 +68,17 @@ function App() {
         <Route path="/investor/signup" element={<SignupInvestor />} />
         <Route path="/investor/login" element={<LoginInvestor />} />
         <Route path="/investor/account-setup" element={<AccountSetupInvestor />} />
+        <Route path="/investor/onboarding/step-1" element={<InvestorAbout />} />
+        <Route path="/investor/forgot-password" element={<ForgotPasswordInvestor />} />
+        <Route path="/investor/verify-code" element={<VerifyCodeInvestor />} />
+        <Route path="/investor/reset-password" element={<SetNewPasswordInvestor />} />
+        <Route path="/investor/verify-email" element={<VerifyEmailInvestor />} />
+        <Route path="/investor/onboarding/step-2" element={<InvestorStep2_InterestAreas />} />
+        <Route path="/investor/onboarding/step-3" element={<InvestorStep3_SocialLinks />} />
+        
+        {/* Add more investor onboarding steps as needed */}
+        
+        {/* Catch-all route for 404 */}
       </Routes>
     </BrowserRouter>
   );
