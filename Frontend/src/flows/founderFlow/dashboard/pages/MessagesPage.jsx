@@ -1,11 +1,11 @@
-import React from 'react'
+import ChatApp from '../../components/messages/ChatApp';
 
 const MessagesPage = () => {
   return (
-    <div>
-      
+    <div className="messages-page">
+      <ChatApp />
     </div>
-  )
-}
+  );
+};
 
-export default MessagesPage
+export default MessagesPage;

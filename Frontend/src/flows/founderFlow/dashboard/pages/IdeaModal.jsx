@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { FiFileText, FiVideo, FiImage } from 'react-icons/fi';
 
-const IdeaModal = ({ onClose, onPost }) => {
+const IdeaModal = ({ isOpen, onClose, onPost }) => {
   const [title, setTitle] = useState('');
   const [descr, setDescr] = useState('');
   const [funding, setFunding] = useState('');
@@ -10,10 +10,11 @@ const IdeaModal = ({ onClose, onPost }) => {
   const [files, setFiles] = useState({ pitch: null, video: null, image: null });
   const [showFunding, setShowFunding] = useState(false);
 
-
   const pitchRef = useRef(null);
   const videoRef = useRef(null);
   const imageRef = useRef(null);
+
+  if (!isOpen) return null;
 
   const handleAddTag = () => {
     const trimmed = inputTag.trim();
@@ -45,26 +46,25 @@ const IdeaModal = ({ onClose, onPost }) => {
     setFiles(prev => ({ ...prev, [type]: file }));
   };
 
-const handleSubmit = (e) => {
-  e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  const imageUrl = files.image ? URL.createObjectURL(files.image) : null;
+    const imageUrl = files.image ? URL.createObjectURL(files.image) : null;
 
- const idea = {
+    const idea = {
   title,
   description: descr,
-  funding: showFunding ? funding : null, // ✅ Only send if checkbox is checked
+  funding: showFunding ? funding : null,
   tags,
-  image: imageUrl,
+  coverImage: imageUrl, // used by Profile
+  image: imageUrl,      // used by QuickPostInput
   createdAt: new Date().toISOString(),
-  author: "You"
 };
 
 
-  onPost(idea); // send to HomePage
-  onClose();
-};
-
+    onPost(idea);
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
@@ -75,58 +75,27 @@ const handleSubmit = (e) => {
         <form onSubmit={handleSubmit} className="space-y-4 text-primary text-sm">
           <div>
             <label className="block font-semibold mb-1">Idea Title</label>
-            <input
-              type="text"
-              placeholder="Enter your startup name or concept"
-              className="input text-black"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+            <input type="text" className="input text-black" value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
 
           <div>
             <label className="block font-semibold mb-1">Description</label>
-            <textarea
-              rows={4}
-              placeholder="Describe your idea..."
-              className="input text-black"
-              value={descr}
-              onChange={(e) => setDescr(e.target.value)}
-            />
+            <textarea rows={4} className="input text-black" value={descr} onChange={(e) => setDescr(e.target.value)} />
           </div>
 
           <div>
             <label className="block font-semibold mb-1">Funding Goal</label>
-            <input
-              type="text"
-              placeholder="₹"
-              className="input text-black"
-              value={funding}
-              onChange={(e) => setFunding(e.target.value)}
-            />
-             <label className="flex items-center gap-2 mt-2 text-xs">
-  <input
-    type="checkbox"
-    checked={showFunding}
-    onChange={(e) => setShowFunding(e.target.checked)}
-    className="accent-purple-600"
-  />
-  Display funding goals publicly
-</label>
-
+            <input type="text" className="input text-black" value={funding} onChange={(e) => setFunding(e.target.value)} />
+            <label className="flex items-center gap-2 mt-2 text-xs">
+              <input type="checkbox" checked={showFunding} onChange={(e) => setShowFunding(e.target.checked)} className="accent-purple-600" />
+              Display funding goals publicly
+            </label>
           </div>
 
-          {/* Tags */}
           <div>
             <label className="block font-semibold mb-1">Add Tags</label>
             <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={inputTag}
-                onChange={(e) => setInputTag(e.target.value)}
-                placeholder="e.g. FinTech"
-                className="flex-1 px-3 py-1 rounded-full border border-purple-200 text-xs outline-none text-black"
-              />
+              <input type="text" value={inputTag} onChange={(e) => setInputTag(e.target.value)} className="flex-1 px-3 py-1 rounded-full border border-purple-200 text-xs outline-none text-black" />
               <button type="button" onClick={handleAddTag} className="text-xs px-3 py-1 rounded-full bg-purple-100 text-primary font-semibold">+ Add</button>
             </div>
             <div className="flex gap-2 flex-wrap">
@@ -139,7 +108,6 @@ const handleSubmit = (e) => {
             </div>
           </div>
 
-          {/* Attachments */}
           <div>
             <label className="block font-semibold mb-1">Attachments</label>
             <div className="flex flex-wrap gap-3">
@@ -160,14 +128,9 @@ const handleSubmit = (e) => {
             </div>
           </div>
 
-          {/* Footer Buttons */}
           <div className="flex justify-between pt-4">
-            <button type="submit" className="bg-primary text-white px-6 py-2 rounded-full font-semibold">
-              Post Idea
-            </button>
-            <button type="button" className="border-2 border-purple-300 px-6 py-2 rounded-full font-semibold text-primary">
-              Preview
-            </button>
+            <button type="submit" className="bg-primary text-white px-6 py-2 rounded-full font-semibold">Post Idea</button>
+            <button type="button" className="border-2 border-purple-300 px-6 py-2 rounded-full font-semibold text-primary">Preview</button>
           </div>
         </form>
       </div>
