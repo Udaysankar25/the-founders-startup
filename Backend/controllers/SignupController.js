@@ -1,43 +1,93 @@
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+import bcrypt from 'bcryptjs';
+import User from '../models/User.js';
+import generateOTP from '../utils/generateOTP.js';
+import sendEmail from '../utils/sendEmail.js';
 
-exports.signup = async (req, res) => {
+export const signup = async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ message: 'Email already registered' });
     }
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(409).json({ message: 'User already exists' });
-
     const hashedPassword = await bcrypt.hash(password, 10);
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      provider: 'email'
+      otp,
+      otpExpires,
     });
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '7d',
-    });
-
-    res.status(201).json({
-      message: 'User created successfully',
-      user: { id: user._id, name: user.name, email: user.email },
-      token,
-    });
+    await sendEmail(email, 'Verify your email', `Your OTP is: ${otp}`);
+    return res.status(201).json({ message: 'Signup successful. OTP sent to email.' });
   } catch (err) {
-    console.error('Signup Error:', err.message);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Signup Error:', err);
+    return res.status(500).json({ message: 'Server error during signup.' });
   }
 };
 
-// Placeholder for Google signup
-exports.googleSignup = async (req, res) => {
-  res.status(501).json({ message: 'Google signup not implemented yet' });
+export const verifyEmail = async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: 'User already verified' });
+    }
+
+    if (user.otp !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    if (user.otpExpires < new Date()) {
+      return res.status(400).json({ message: 'OTP expired' });
+    }
+
+    user.isVerified = true;
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+
+    return res.status(200).json({ message: 'Email verified successfully' });
+  } catch (err) {
+    console.error('OTP Verification Error:', err);
+    return res.status(500).json({ message: 'Server error during verification.' });
+  }
+};
+export const resendOTP = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: 'User already verified' });
+    }
+
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    user.otp = otp;
+    user.otpExpires = otpExpires;
+    await user.save();
+
+    await sendEmail(email, 'Your New OTP Code', `Your new OTP is: ${otp}`);
+
+    return res.status(200).json({ message: 'OTP resent successfully' });
+  } catch (err) {
+    console.error('Resend OTP Error:', err);
+    res.status(500).json({ message: 'Server error while resending OTP' });
+  }
 };

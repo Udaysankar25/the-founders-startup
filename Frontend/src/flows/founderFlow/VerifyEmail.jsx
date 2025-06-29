@@ -16,14 +16,53 @@ const VerifyEmail = () => {
     setCode(updated);
   };
 
-  const handleVerify = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
-    navigate('/founder/account-setup');
+    const enteredOtp = code.join('');
+
+    try {
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp: enteredOtp }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'OTP verification failed');
+      }
+
+      alert('✅ Email verified successfully!');
+      navigate('/founder/onboarding/step-1');
+    } catch (err) {
+      alert(`❌ ${err.message}`);
+    }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setShowPopup(true);
     setTimer(45);
+
+    try {
+      const response = await fetch('/api/auth/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to resend OTP');
+      }
+
+      console.log('✅ Resent OTP:', data.message);
+    } catch (err) {
+      alert(`❌ ${err.message}`);
+    }
+
+    // Start countdown again
     const interval = setInterval(() => {
       setTimer((prev) => {
         if (prev <= 1) {

@@ -11,11 +11,11 @@ const SignupFounder = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const handleSignup = (e) => {
-    e.preventDefault();
-    navigate('/founder/verify-email', { state: { email: 'your@email.com' } });
+  // const handleSignup = (e) => {
+  //   e.preventDefault();
+  //   navigate('/founder/verify-email', { state: { email: 'your@email.com' } });
 
-  };
+  // };
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -40,7 +40,7 @@ const SignupFounder = () => {
       // Optional: Save token if needed
       // localStorage.setItem('token', data.token);
 
-      navigate('/founder/account-setup');
+      navigate('/founder/verify-email', { state: { email: 'your@email.com' } });
     } catch (err) {
       setError(err.message);
     }

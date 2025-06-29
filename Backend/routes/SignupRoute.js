@@ -1,8 +1,10 @@
-const express = require('express');
+import express from 'express';
+import { signup, verifyEmail, resendOTP } from '../controllers/SignupController.js';
+
 const router = express.Router();
-const { signup, googleSignup } = require('../controllers/authController');
 
 router.post('/signup', signup);
-router.post('/google-signup', googleSignup); // for future use
+router.post('/verify-email', verifyEmail  )
+router.post('/resend-otp', resendOTP)
 
-module.exports = router;
+export default router;

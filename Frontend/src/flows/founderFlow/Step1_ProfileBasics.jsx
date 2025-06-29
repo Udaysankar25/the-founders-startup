@@ -117,7 +117,7 @@ const Step1_ProfileBasics = () => {
                   <div className="flex justify-between items-center pt-4">
                     <button
                       type="button"
-                      onClick={() => navigate('/founder/account-setup')}
+                      onClick={() => navigate('/founder/verify-email')}
                       className="text-purple-700 font-medium"
                     >
                       Back
