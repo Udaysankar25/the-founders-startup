@@ -6,14 +6,40 @@ import bg from '../../assets/images/bg-auth.png';
 const SignupFounder = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [password, setPassword] = useState('');
 
-  const handleSignup = (e) => {
-    e.preventDefault();
-    navigate('/founder/account-setup');
-  };
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Something went wrong');
+      }
+
+      // Optional: Save token if needed
+      // localStorage.setItem('token', data.token);
+
+      navigate('/founder/account-setup');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8">
@@ -29,13 +55,27 @@ const SignupFounder = () => {
               {/* Name Field */}
               <div>
                 <label className="block text-primary font-semibold mb-1">Name</label>
-                <input type="text" placeholder="Your name" className="input h-[40px]" required />
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  className="input h-[40px]"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
               </div>
 
               {/* Email Field */}
               <div>
                 <label className="block text-primary font-semibold mb-1">E-mail</label>
-                <input type="email" placeholder="you@example.com" className="input h-[40px]" required />
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  className="input h-[40px]"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
 
               {/* Password Field */}
@@ -69,6 +109,9 @@ const SignupFounder = () => {
                 </label>
               </div>
 
+              {/* Error Message */}
+              {error && <p className="text-red-600 text-sm">{error}</p>}
+
               {/* Submit Button */}
               <button type="submit" className="w-full bg-primary text-white py-2.5 rounded-full font-semibold hover:bg-primary/90">
                 Sign Up
@@ -91,7 +134,7 @@ const SignupFounder = () => {
               </div>
 
               {/* Google Sign Up */}
-              <button className="w-full flex items-center justify-center border border-gray-300 py-2.5 rounded-full gap-2 bg-white hover:bg-gray-50">
+              <button type="button" className="w-full flex items-center justify-center border border-gray-300 py-2.5 rounded-full gap-2 bg-white hover:bg-gray-50">
                 <img
                   src="https://www.svgrepo.com/show/475656/google-color.svg"
                   alt="Google"
@@ -102,6 +145,7 @@ const SignupFounder = () => {
             </form>
           </div>
         </div>
+
         {/* Left Panel (Image + Text) */}
         <div
           className="w-full lg:w-[40%] bg-cover bg-center text-white flex flex-col justify-start items-center p-6 md:p-10 
