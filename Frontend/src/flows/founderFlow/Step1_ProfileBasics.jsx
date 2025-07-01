@@ -6,9 +6,10 @@ import { FiArrowRight, FiEdit2, FiUser } from 'react-icons/fi';
 import bg from '../../assets/images/bg-auth.png';
 
 const validationSchema = Yup.object({
-  headline: Yup.string().required('Headline is required'),
-  bio: Yup.string().max(250, 'Maximum 250 characters').required('Bio is required'),
+  headline: Yup.string(), // No .required()
+  bio: Yup.string().max(250, 'Maximum 250 characters'),
 });
+
 
 const Step1_ProfileBasics = () => {
   const navigate = useNavigate();
@@ -22,10 +23,11 @@ const Step1_ProfileBasics = () => {
     }
   };
 
-  const handleSubmit = (values) => {
-    console.log('Step 1 Data:', values);
-    navigate('/founder/onboarding/step-2');
-  };
+ const handleSubmit = (values) => {
+  localStorage.setItem('step1', JSON.stringify(values));
+  navigate('/founder/onboarding/step-2');
+};
+
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8">

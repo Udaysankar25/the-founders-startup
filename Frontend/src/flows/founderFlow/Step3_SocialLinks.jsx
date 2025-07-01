@@ -6,23 +6,63 @@ import { FiArrowRight } from 'react-icons/fi';
 import bg from '../../assets/images/bg-auth.png';
 
 const validationSchema = Yup.object({
-  linkedin: Yup.string().url('Invalid URL').required('LinkedIn is required'),
-  github: Yup.string().url('Invalid URL').required('GitHub / Portfolio is required'),
-  website: Yup.string().url('Invalid URL'),
+  linkedin: Yup.string().url('Invalid URL').nullable(),
+  github: Yup.string().url('Invalid URL').nullable(),
+  website: Yup.string().url('Invalid URL').nullable(),
 });
 
 const Step3_SocialLinks = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = (values) => {
-    console.log('Final Step Data:', values);
-    navigate('/founder/login');
+  const handleSubmit = async (values) => {
+    try {
+      const email = localStorage.getItem('signupEmail');
+      const step1 = JSON.parse(localStorage.getItem('step1') || '{}');
+      const step2 = JSON.parse(localStorage.getItem('step2') || '{}');
+
+      if (!email) {
+        alert('❌ Email not found. Please restart signup.');
+        return;
+      }
+
+      const payload = {
+        email,
+        profilePicture: step1.profilePicture || null,
+        headline: step1.headline || null,
+        bio: step1.bio || null,
+        interests: step2.interests || [],
+        skills: step2.skills || null,
+        lookingFor: step2.lookingFor || [],
+        linkedin: values.linkedin || null,
+        github: values.github || null,
+        website: values.website || null,
+      };
+
+      const response = await fetch('/api/auth/complete-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.message || 'Something went wrong');
+
+      alert('🎉 Account created successfully!');
+      localStorage.removeItem('signupEmail');
+      localStorage.removeItem('step1');
+      localStorage.removeItem('step2');
+
+      navigate('/founder/login');
+    } catch (err) {
+      alert(`❌ ${err.message}`);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-[1000px] bg-white rounded-[24px] shadow-lg flex flex-col lg:flex-row min-h-[540px]">
-        
+
         {/* Left Panel */}
         <div
           className="w-full lg:w-[40%] bg-cover bg-center text-white flex flex-col justify-start items-center p-6 md:p-10 
@@ -46,11 +86,7 @@ const Step3_SocialLinks = () => {
             </h2>
 
             <Formik
-              initialValues={{
-                linkedin: '',
-                github: '',
-                website: '',
-              }}
+              initialValues={{ linkedin: '', github: '', website: '' }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >

@@ -18,18 +18,18 @@ const lookingForOptions = [
 ];
 
 const validationSchema = Yup.object({
-    interests: Yup.array().min(1, 'Select at least one interest'),
-    skills: Yup.string().required('Skills are required'),
-    lookingFor: Yup.array().min(1, 'Select at least one option'),
+  interests: Yup.array(),
+  skills: Yup.string(),
+  lookingFor: Yup.array(),
 });
 
 const Step2_InterestAreas = () => {
     const navigate = useNavigate();
+const handleSubmit = (values) => {
+  localStorage.setItem('step2', JSON.stringify(values));
+  navigate('/founder/onboarding/step-3');
+};
 
-    const handleSubmit = (values) => {
-        console.log('Step 2 Data:', values);
-        navigate('/founder/onboarding/step-3');
-    };
 
     return (
         <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8">
