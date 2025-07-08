@@ -2,8 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   FiHome,
-  FiBriefcase,
-  FiTrendingUp,
+  FiUsers,
   FiMessageCircle,
   FiBell,
   FiUser
@@ -12,8 +11,7 @@ import {
 const InvestorSidebar = () => {
   const menu = [
     { icon: <FiHome />, label: 'Home', path: '' },
-    { icon: <FiBriefcase />, label: 'Portfolio', path: 'portfolio' },
-    { icon: <FiTrendingUp />, label: 'Opportunities', path: 'opportunities' },
+    { icon: <FiUsers />, label: 'Teams', path: 'teams' },
     { icon: <FiMessageCircle />, label: 'Messages', path: 'messages' },
     { icon: <FiBell />, label: 'Notifications', path: 'notifications' },
     { icon: <FiUser />, label: 'Profile', path: 'profile' },
