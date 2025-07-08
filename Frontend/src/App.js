@@ -33,6 +33,14 @@ import VerifyEmailInvestor from './flows/investorFlow/VerifyEmailInvestor';
 import InvestorStep3_SocialLinks from './flows/investorFlow/InvestorStep3_SocialLinks'; // Uncomment if needed
 import InvestorStep2_InterestAreas from './flows/investorFlow/InvestorStep2_InterestAreas';
 
+import InvestorDashboardLayout from './flows/investorFlow/dashboard/InvestorDashboardLayout';
+import InvestorHomePage from './flows/investorFlow/dashboard/pages/HomePage';
+import PortfolioPage from './flows/investorFlow/dashboard/pages/PortfolioPage';
+import OpportunitiesPage from './flows/investorFlow/dashboard/pages/OpportunitiesPage';
+import InvestorMessagesPage from './flows/investorFlow/dashboard/pages/MessagesPage';
+import InvestorNotificationsPage from './flows/investorFlow/dashboard/pages/NotificationsPage';
+import InvestorProfilePage from './flows/investorFlow/dashboard/pages/ProfilePage';
+
 
 function App() {
   return (
@@ -75,9 +83,17 @@ function App() {
         <Route path="/investor/verify-email" element={<VerifyEmailInvestor />} />
         <Route path="/investor/onboarding/step-2" element={<InvestorStep2_InterestAreas />} />
         <Route path="/investor/onboarding/step-3" element={<InvestorStep3_SocialLinks />} />
-        
+
         {/* Add more investor onboarding steps as needed */}
-        
+        <Route path="/investor/dashboard" element={<InvestorDashboardLayout />}>
+          <Route index element={<InvestorHomePage />} />
+          <Route path="portfolio" element={<PortfolioPage />} />
+          <Route path="opportunities" element={<OpportunitiesPage />} />
+          <Route path="messages" element={<InvestorMessagesPage />} />
+          <Route path="notifications" element={<InvestorNotificationsPage />} />
+          <Route path="profile" element={<InvestorProfilePage />} />
+        </Route>
+
         {/* Catch-all route for 404 */}
       </Routes>
     </BrowserRouter>

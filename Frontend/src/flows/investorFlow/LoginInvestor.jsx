@@ -7,7 +7,7 @@ const LoginInvestor = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    navigate('/investor/account-setup');
+    navigate('/investor/dashboard');
   };
 
   return (
