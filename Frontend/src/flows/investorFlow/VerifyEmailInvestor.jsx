@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import bg from '../../assets/images/bg-auth.png';
 
@@ -6,28 +6,51 @@ const VerifyEmailInvestor = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const email = location.state?.email || 'your@email.com';
+
   const [code, setCode] = useState(Array(6).fill(''));
   const [showPopup, setShowPopup] = useState(false);
-  const [timer, setTimer] = useState(45);
+  const [timer, setTimer] = useState(0);
+  const [verified, setVerified] = useState(false);
+
+  const inputRefs = useRef([]);
+
+  useEffect(() => {
+    inputRefs.current[0]?.focus();
+  }, []);
 
   const handleChange = (value, idx) => {
+    if (!/^[0-9a-zA-Z]*$/.test(value)) return;
+
     const updated = [...code];
     updated[idx] = value;
     setCode(updated);
+
+    if (value && idx < 5) {
+      inputRefs.current[idx + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e, idx) => {
+    if (e.key === 'Backspace' && !code[idx] && idx > 0) {
+      inputRefs.current[idx - 1]?.focus();
+    }
   };
 
   const handleVerify = (e) => {
     e.preventDefault();
-    // Simulate successful verification
-    alert('✅ Email verified successfully!');
-    navigate('/investor/onboarding/step-1');
+
+    const enteredCode = code.join('');
+    if (enteredCode.length === 6) {
+      setVerified(true);
+      setTimeout(() => {
+        navigate('/investor/onboarding/step-1');
+      }, 1200);
+    }
   };
 
   const handleResend = () => {
     setShowPopup(true);
     setTimer(45);
-
-    // Simulate resend
     console.log('✔ OTP resent to:', email);
 
     const interval = setInterval(() => {
@@ -48,6 +71,8 @@ const VerifyEmailInvestor = () => {
         {/* Left Panel */}
         <div className="relative w-full lg:w-[60%] bg-card px-6 md:px-10 lg:px-20 py-10 flex justify-center 
         rounded-b-[24px] lg:rounded-tl-[24px] lg:rounded-bl-[24px] lg:rounded-tr-none lg:rounded-br-none">
+
+          {/* Resend popup */}
           {showPopup && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
             bg-white border border-gray-200 rounded-2xl p-6 w-[340px] z-50 shadow-xl text-center">
@@ -60,16 +85,19 @@ const VerifyEmailInvestor = () => {
 
           <div className="w-full max-w-[530px]">
             <h2 className="text-2xl font-bold text-[#800080] mb-6 text-center">Verify Email</h2>
+
             <form onSubmit={handleVerify} className="space-y-6">
-              <label className="block text-[#800080] font-semibold mb-1">E-mail</label>
+              <label className="block text-[#800080] font-semibold mb-1">Enter 6-digit Code</label>
               <div className="flex justify-between gap-2">
                 {code.map((value, idx) => (
                   <input
                     key={idx}
                     maxLength="1"
+                    ref={(el) => (inputRefs.current[idx] = el)}
                     value={value}
                     onChange={(e) => handleChange(e.target.value, idx)}
-                    className="w-12 h-12 border border-[#800080] rounded text-center text-xl"
+                    onKeyDown={(e) => handleKeyDown(e, idx)}
+                    className="w-12 h-12 border border-[#800080] rounded text-center text-xl text-[#800080] focus:outline-none focus:ring-2 focus:ring-[#800080]"
                   />
                 ))}
               </div>
@@ -80,6 +108,12 @@ const VerifyEmailInvestor = () => {
               >
                 Verify
               </button>
+
+              {verified && (
+                <p className="text-center text-green-600 font-medium mt-2">
+                  ✅ Email verified successfully!
+                </p>
+              )}
             </form>
 
             <p className="text-sm mt-4 text-center">

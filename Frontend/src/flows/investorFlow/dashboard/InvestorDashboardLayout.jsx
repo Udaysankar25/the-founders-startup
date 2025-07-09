@@ -1,23 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import InvestorSidebar from '../components/InvestorSidebar';
 import Topbar from '../components/Topbar';
 import ProfileSummary from '../components/ProfileSummary';
 
 const InvestorDashboardLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#fceeff] flex flex-col">
-      {/* Fixed Topbar */}
+      {/* Topbar */}
       <div className="fixed top-0 left-0 right-0 z-50">
-        <Topbar />
+        <Topbar onToggleSidebar={() => setSidebarOpen(true)} />
       </div>
+
+      {/* Sidebar: handles both desktop and mobile */}
+      <InvestorSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main Layout */}
       <div className="flex flex-1 pt-[64px] overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-[80px] bg-[#f4eaff] shadow-inner flex-shrink-0">
-          <InvestorSidebar />
-        </div>
+        {/* Push content for sidebar on desktop */}
+        <div className="hidden md:block w-[80px] flex-shrink-0" />
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-6 h-[calc(100vh-64px)] scrollbar-hidden">
