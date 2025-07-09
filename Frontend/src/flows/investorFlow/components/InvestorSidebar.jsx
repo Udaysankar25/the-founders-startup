@@ -1,15 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  FiHome,
-  FiUsers,
-  FiMessageCircle,
-  FiBell,
-  FiUser,
-  FiX,
+  FiHome, FiUsers, FiPlus, FiMessageCircle, FiBell, FiUser, FiX
 } from 'react-icons/fi';
+import IdeaModal from '../../founderFlow/dashboard/pages/IdeaModal';
 
-const InvestorSidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose }) => {
+  const [showModal, setShowModal] = React.useState(false);
+
   const menu = [
     { icon: <FiHome />, label: 'Home', path: '' },
     { icon: <FiUsers />, label: 'Teams', path: 'teams' },
@@ -20,53 +18,76 @@ const InvestorSidebar = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* ------------ Desktop Sidebar ------------ */}
-      <aside className="hidden md:flex w-[80px] bg-[#f4eaff] py-6 flex-col items-center gap-6 shadow-inner fixed top-[64px] left-0 h-[calc(100vh-64px)] z-30">
-        {menu.map((item, idx) => (
-          <NavLink
-            key={idx}
-            to={`/investor/dashboard/${item.path}`}
-            end={item.path === ''}
-            className={({ isActive }) =>
-              `text-[22px] ${
-                isActive
-                  ? 'text-purple-800 font-bold'
-                  : 'text-purple-500 hover:text-purple-700'
-              }`
-            }
-            title={item.label}
-          >
-            {item.icon}
-          </NavLink>
-        ))}
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex w-[80px] bg-[#f4eaff] py-6 flex-col items-center gap-6 shadow-inner fixed top-[72px] left-0 h-[calc(100vh-72px)] z-30">
+        {menu.map((item, idx) =>
+          item.path === '#' ? (
+            <button
+              key={idx}
+              onClick={item.onClick}
+              className="text-[22px] text-primary/70 hover:text-primary transition"
+            >
+              {item.icon}
+            </button>
+          ) : (
+            <NavLink
+              key={idx}
+              to={`/investor/dashboard/${item.path}`}
+              end={item.path === ''}
+              className={({ isActive }) =>
+                `text-[22px] ${
+                  isActive ? 'text-primary font-bold' : 'text-primary/70 hover:text-primary'
+                }`
+              }
+              title={item.label}
+            >
+              {item.icon}
+            </NavLink>
+          )
+        )}
       </aside>
 
-      {/* ------------ Mobile Drawer Sidebar ------------ */}
+      {/* Mobile Drawer Sidebar */}
       {isOpen && (
         <div className="fixed inset-0 bg-black/30 z-40 md:hidden">
           <div className="bg-white w-64 h-full shadow-xl p-6 relative z-50">
             <button onClick={onClose} className="absolute top-4 right-4 text-gray-500">
               <FiX size={22} />
             </button>
-
             <div className="flex flex-col gap-5 mt-10">
-              {menu.map((item, idx) => (
-                <NavLink
-                  key={idx}
-                  to={`/investor/dashboard/${item.path}`}
-                  className="flex items-center gap-3 text-lg text-purple-700"
-                  onClick={onClose}
-                >
-                  {item.icon}
-                  {item.label}
-                </NavLink>
-              ))}
+              {menu.map((item, idx) =>
+                item.path === '#' ? (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      item.onClick();
+                      onClose();
+                    }}
+                    className="flex items-center gap-3 text-lg text-primary"
+                  >
+                    {item.icon}
+                    {item.label}
+                  </button>
+                ) : (
+                  <NavLink
+                    key={idx}
+                    to={`/founder/dashboard/${item.path}`}
+                    className="flex items-center gap-3 text-lg text-primary"
+                    onClick={onClose}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </NavLink>
+                )
+              )}
             </div>
           </div>
         </div>
       )}
+
+      <IdeaModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </>
   );
 };
 
-export default InvestorSidebar;
+export default Sidebar;

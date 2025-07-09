@@ -41,6 +41,7 @@ import OpportunitiesPage from './flows/investorFlow/dashboard/pages/Opportunitie
 import InvestorMessagesPage from './flows/investorFlow/dashboard/pages/MessagesPage';
 import InvestorNotificationsPage from './flows/investorFlow/dashboard/pages/NotificationsPage';
 import InvestorProfilePage from './flows/investorFlow/dashboard/pages/ProfilePage';
+import InvestorTeamsPage from './flows/investorFlow/dashboard/pages/TeamsPage';
 import InvestorEditProfile from './flows/investorFlow/dashboard/pages/InvestorEditProfile'; // Uncomment if needed
 
 
@@ -96,6 +97,7 @@ function App() {
           <Route path="notifications" element={<InvestorNotificationsPage />} />
           <Route path="profile" element={<InvestorProfilePage />} />
           <Route path="profile/edit" element={<InvestorEditProfile />} />
+          <Route path="teams" element={<InvestorTeamsPage />} />
         </Route>
 
         {/* Catch-all route for 404 */}

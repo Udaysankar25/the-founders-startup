@@ -19,9 +19,10 @@ const DashboardLayout = () => {
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 h-[calc(100vh-72px)]">
-          <Outlet />
-        </main>
+        <main className="flex-1 overflow-y-scroll md:ml-[80px] p-4 md:p-6 h-[calc(100vh-72px)] scrollbar-hide">
+  <Outlet />
+</main>
+
 
         {/* Right Panel */}
         <aside className="hidden xl:block w-[300px] p-4 bg-[#f4eaff] border-l border-purple-200">
