@@ -1,27 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
-import IdeaModal from '../../founderFlow/dashboard/pages/IdeaModal'; // import modal
 import {
-  FiHome,
-  FiUsers,
-  FiPlus,
-  FiMessageCircle,
-  FiBell,
-  FiUser
+  FiHome, FiUsers, FiPlus, FiMessageCircle, FiBell, FiUser, FiX
 } from 'react-icons/fi';
+import IdeaModal from '../../founderFlow/dashboard/pages/IdeaModal';
 
-
-const Sidebar = () => {
-  const [showModal, setShowModal] = useState(false);
+const Sidebar = ({ isOpen, onClose }) => {
+  const [showModal, setShowModal] = React.useState(false);
 
   const menu = [
     { icon: <FiHome />, label: 'Home', path: '' },
     { icon: <FiUsers />, label: 'Teams', path: 'teams' },
     {
-      icon: <FiPlus />,
-      label: 'Create',
-      path: '#',
-      onClick: () => setShowModal(true), // custom click
+      icon: <FiPlus />, label: 'Create', path: '#',
+      onClick: () => setShowModal(true),
     },
     { icon: <FiMessageCircle />, label: 'Messages', path: 'messages' },
     { icon: <FiBell />, label: 'Notifications', path: 'notifications' },
@@ -30,19 +22,16 @@ const Sidebar = () => {
 
   return (
     <>
-      <aside className="w-[80px] bg-card py-6 mt-[64px] flex flex-col items-center gap-6 shadow-inner fixed top-0 left-0 h-screen z-30">
-        {menu.map((item, idx) => {
-          const isCustomClick = item.path === '#';
-          return isCustomClick ? (
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex w-[80px] bg-[#f4eaff] py-6 flex-col items-center gap-6 shadow-inner fixed top-[72px] left-0 h-[calc(100vh-72px)] z-30">
+        {menu.map((item, idx) =>
+          item.path === '#' ? (
             <button
               key={idx}
               onClick={item.onClick}
-              className="group relative flex items-center justify-center text-[22px] w-10 h-10 text-primary/70 hover:text-primary transition"
+              className="text-[22px] text-primary/70 hover:text-primary transition"
             >
               {item.icon}
-              <span className="absolute left-12 bg-primary text-white text-xs font-medium px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                {item.label}
-              </span>
             </button>
           ) : (
             <NavLink
@@ -50,23 +39,57 @@ const Sidebar = () => {
               to={`/founder/dashboard/${item.path}`}
               end={item.path === ''}
               className={({ isActive }) =>
-                `group relative flex items-center justify-center text-[22px] w-10 h-10 ${
+                `text-[22px] ${
                   isActive ? 'text-primary font-bold' : 'text-primary/70 hover:text-primary'
                 }`
               }
               title={item.label}
             >
               {item.icon}
-              <span className="absolute left-12 bg-primary text-white text-xs font-medium px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                {item.label}
-              </span>
             </NavLink>
-          );
-        })}
+          )
+        )}
       </aside>
 
-      <IdeaModal isOpen={showModal} onClose={() => setShowModal(false)} />
+      {/* Mobile Drawer Sidebar */}
+      {isOpen && (
+        <div className="fixed inset-0 bg-black/30 z-40 md:hidden">
+          <div className="bg-white w-64 h-full shadow-xl p-6 relative z-50">
+            <button onClick={onClose} className="absolute top-4 right-4 text-gray-500">
+              <FiX size={22} />
+            </button>
+            <div className="flex flex-col gap-5 mt-10">
+              {menu.map((item, idx) =>
+                item.path === '#' ? (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      item.onClick();
+                      onClose();
+                    }}
+                    className="flex items-center gap-3 text-lg text-primary"
+                  >
+                    {item.icon}
+                    {item.label}
+                  </button>
+                ) : (
+                  <NavLink
+                    key={idx}
+                    to={`/founder/dashboard/${item.path}`}
+                    className="flex items-center gap-3 text-lg text-primary"
+                    onClick={onClose}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </NavLink>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
+      <IdeaModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </>
   );
 };

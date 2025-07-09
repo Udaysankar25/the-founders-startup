@@ -20,6 +20,7 @@ import TeamsPage from './flows/founderFlow/dashboard/pages/TeamsPage';
 import MessagesPage from './flows/founderFlow/dashboard/pages/MessagesPage';
 import NotificationsPage from './flows/founderFlow/dashboard/pages/NotificationsPage';
 import ProfilePage from './flows/founderFlow/dashboard/pages/ProfilePage';
+import UpdateProfile from './flows/founderFlow/dashboard/pages/UpdateProfile';
 
 // Investor Flow
 import SignupInvestor from './flows/investorFlow/SignupInvestor';
@@ -70,6 +71,7 @@ function App() {
           <Route path="messages" element={<MessagesPage />} />
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="profile/edit" element={<UpdateProfile />} />
         </Route>
 
         {/* Investor Routes */}

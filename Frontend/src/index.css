@@ -81,3 +81,11 @@ body {
   }
   
 }
+.input {
+  @apply mt-1 w-full border border-purple-300 rounded-md px-4 py-2;
+}
+
+.btn {
+  @apply bg-purple-700 text-white font-semibold px-6 py-2 rounded-md hover:bg-purple-800;
+}
+

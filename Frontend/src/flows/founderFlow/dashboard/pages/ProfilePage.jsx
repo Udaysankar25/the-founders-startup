@@ -46,22 +46,18 @@ const Profile = () => {
     setLiked((prev) => ({ ...prev, [idx]: !prev[idx] }));
   };
 
- const handlePostIdea = (newIdea) => {
-  const posted = {
-    ...newIdea,
-    coverImage: newIdea.coverImage, // already there
-    timeAgo: 'Just now',
-    user: {
-      name: 'Anna Clark',
-      avatar: avatar || 'https://i.pravatar.cc/40?img=68',
-    },
+  const handlePostIdea = (newIdea) => {
+    const posted = {
+      ...newIdea,
+      timeAgo: 'Just now',
+      user: {
+        name: 'Anna Clark',
+        avatar: avatar || 'https://i.pravatar.cc/40?img=68',
+      },
+    };
+    setIdeas([posted, ...ideas]);
+    setIsModalOpen(false);
   };
-  setIdeas([posted, ...ideas]);
-  setIsModalOpen(false);
-};
-
-
-
 
   const ActionButton = ({ icon, onClick }) => (
     <button
@@ -73,7 +69,7 @@ const Profile = () => {
   );
 
   return (
-    <div className="max-w-5xl mx-auto p-6 font-sans space-y-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-8">
       {/* Header */}
       <div className="rounded-xl shadow-md bg-white overflow-hidden">
         <div
@@ -96,7 +92,7 @@ const Profile = () => {
           </button>
           <input type="file" accept="image/*" ref={bgInputRef} onChange={handleBgChange} className="hidden" />
 
-          <div className="relative z-10 w-full flex items-end gap-6 p-6 sm:p-8">
+          <div className="relative z-10 w-full flex flex-col sm:flex-row items-center sm:items-end gap-4 p-6 sm:p-8">
             <label className="cursor-pointer group">
               <div className="w-24 h-24 rounded-full border-4 border-white bg-white overflow-hidden shadow-md group-hover:shadow-xl transition">
                 {avatar ? (
@@ -112,10 +108,10 @@ const Profile = () => {
               <input type="file" accept="image/*" ref={avatarInputRef} onChange={handleAvatarChange} className="hidden" />
             </label>
 
-            <div className="flex-1">
-              <h2 className="text-2xl font-semibold">Anna Clark</h2>
+            <div className="flex-1 text-center sm:text-left">
+              <h2 className="text-2xl sm:text-3xl font-semibold">Anna Clark</h2>
               <p className="italic text-sm text-gray-200 mt-1">“Turning ideas into impact”</p>
-              <div className="flex gap-6 mt-4 text-sm">
+              <div className="flex justify-center sm:justify-start gap-6 mt-4 text-sm">
                 <div><span className="block font-semibold text-white text-lg">12</span><span className="text-gray-300">Ideas</span></div>
                 <div><span className="block font-semibold text-white text-lg">3</span><span className="text-gray-300">Teams</span></div>
                 <div><span className="block font-semibold text-white text-lg">5</span><span className="text-gray-300">Startups</span></div>
@@ -125,16 +121,16 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Ideas */}
-      <div className="rounded-xl shadow-md bg-white p-6">
-        <div className="flex justify-between items-center mb-6">
+      {/* Ideas Section */}
+      <div className="rounded-xl shadow-md bg-white p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
           <div>
-            <h3 className="text-2xl font-bold text-gray-800">Your Ideas</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-800">Your Ideas</h3>
             <p className="text-sm text-gray-500">All the concepts you're nurturing</p>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 bg-purple-600 text-white px-5 py-2.5 rounded-lg hover:bg-purple-700 transition"
+            className="flex items-center gap-2 bg-[#800080] text-white px-5 py-2.5 rounded-lg hover:bg-purple-700 transition"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -143,8 +139,8 @@ const Profile = () => {
           </button>
         </div>
 
-        {/* Scrollable Cards */}
-        <div className="flex gap-6 overflow-x-auto pb-4 hide-scrollbar px-1 sm:px-2">
+        {/* Scrollable Idea Cards */}
+        <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar -mx-2 px-2 sm:px-0">
           <style>{`
             .hide-scrollbar::-webkit-scrollbar { display: none; }
             .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
@@ -153,9 +149,9 @@ const Profile = () => {
           {ideas.map((idea, idx) => (
             <div
               key={idx}
-              className="min-w-[300px] max-w-xs bg-white border border-[#800080]/10 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 snap-start flex-shrink-0 flex flex-col group hover:-translate-y-1"
+              className="min-w-[260px] sm:min-w-[300px] max-w-xs bg-white border border-[#800080]/10 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 snap-start flex-shrink-0 flex flex-col group hover:-translate-y-1"
             >
-              <div className="h-44 relative overflow-hidden rounded-t-xl">
+              <div className="h-40 sm:h-44 relative overflow-hidden rounded-t-xl">
                 <img
                   src={idea.coverImage}
                   alt={idea.title}

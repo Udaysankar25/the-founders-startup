@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import bg from '../../assets/images/bg-auth.png';
 
@@ -12,20 +12,33 @@ const VerifyCode = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [timer, setTimer] = useState(45);
 
+  const inputRefs = useRef([]);
+
   useEffect(() => {
     if (!email) {
-      console.warn('[VerifyCode] No email found in location state.');
       setError('Missing email. Please restart the password reset process.');
-    } else {
-      console.log('[VerifyCode] Loaded with email:', email);
     }
+    // Auto focus on first input
+    inputRefs.current[0]?.focus();
   }, [email]);
 
   const handleChange = (value, idx) => {
-    const copy = [...code];
-    copy[idx] = value;
-    setCode(copy);
-    console.log(`[OTP Input] Code so far: ${copy.join('')}`);
+    if (!/^\d?$/.test(value)) return; // Only allow digits or empty string
+
+    const newCode = [...code];
+    newCode[idx] = value;
+    setCode(newCode);
+
+    // Move to next field if current one is filled
+    if (value && idx < 5) {
+      inputRefs.current[idx + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e, idx) => {
+    if (e.key === 'Backspace' && !code[idx] && idx > 0) {
+      inputRefs.current[idx - 1]?.focus();
+    }
   };
 
   const handleVerify = async (e) => {
@@ -33,10 +46,7 @@ const VerifyCode = () => {
     setError('');
 
     const otp = code.join('');
-    console.log('[handleVerify] Submitting:', { email, otp });
-
     if (!email || otp.length !== 6) {
-      console.warn('[handleVerify] Invalid input:', { email, otp });
       setError('Invalid input. Ensure email and 6-digit OTP are provided.');
       return;
     }
@@ -49,18 +59,15 @@ const VerifyCode = () => {
       });
 
       const data = await res.json();
-      console.log('[handleVerify] Server response:', res.status, data);
 
       if (!res.ok) throw new Error(data.message);
       navigate('/founder/reset-password', { state: { email } });
     } catch (err) {
-      console.error('[handleVerify] Error verifying OTP:', err.message);
       setError(err.message);
     }
   };
 
   const handleResend = async () => {
-    console.log('[handleResend] Resending OTP to:', email);
     try {
       const res = await fetch('/api/auth/forgot-password-request', {
         method: 'POST',
@@ -69,8 +76,6 @@ const VerifyCode = () => {
       });
 
       const data = await res.json();
-      console.log('[handleResend] Server response:', res.status, data);
-
       if (!res.ok) throw new Error(data.message);
 
       setShowPopup(true);
@@ -85,7 +90,6 @@ const VerifyCode = () => {
         });
       }, 1000);
     } catch (err) {
-      console.error('[handleResend] Error resending OTP:', err.message);
       setError('Failed to resend OTP. Try again later.');
     }
   };
@@ -108,6 +112,7 @@ const VerifyCode = () => {
           </div>
         </div>
       )}
+
       <div className="w-full max-w-[1000px] bg-white rounded-2xl shadow-lg flex flex-col lg:flex-row min-h-[540px]">
         <div className="w-full lg:w-3/5 bg-card p-10 flex flex-col justify-center">
           <h2 className="text-2xl font-bold text-primary mb-3 text-center">Password Reset</h2>
@@ -118,9 +123,13 @@ const VerifyCode = () => {
               {code.map((v, idx) => (
                 <input
                   key={idx}
+                  type="text"
+                  inputMode="numeric"
                   maxLength="1"
                   value={v}
+                  ref={(el) => (inputRefs.current[idx] = el)}
                   onChange={(e) => handleChange(e.target.value, idx)}
+                  onKeyDown={(e) => handleKeyDown(e, idx)}
                   className="w-12 h-12 border rounded text-center text-xl"
                 />
               ))}
@@ -142,6 +151,7 @@ const VerifyCode = () => {
             <a href="/founder/login" className="text-primary font-medium">Back to log in</a>
           </p>
         </div>
+
         <div
           className="w-full lg:w-2/5 bg-cover bg-center flex items-center justify-center p-10 rounded-tr-2xl rounded-br-2xl"
           style={{ backgroundImage: `url(${bg})` }}

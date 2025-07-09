@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import bg from '../../assets/images/bg-auth.png';
 
@@ -6,14 +6,34 @@ const VerifyCodeInvestor = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const email = location.state?.email;
+
   const [code, setCode] = useState(Array(6).fill(''));
   const [showPopup, setShowPopup] = useState(false);
   const [timer, setTimer] = useState(45);
 
+  const inputRefs = useRef([]);
+
+  useEffect(() => {
+    inputRefs.current[0]?.focus();
+  }, []);
+
   const handleChange = (value, idx) => {
+    if (!/^\d?$/.test(value)) return;
+
     const updated = [...code];
     updated[idx] = value;
     setCode(updated);
+
+    // Move to next input if value is entered
+    if (value && idx < 5) {
+      inputRefs.current[idx + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e, idx) => {
+    if (e.key === 'Backspace' && !code[idx] && idx > 0) {
+      inputRefs.current[idx - 1]?.focus();
+    }
   };
 
   const handleVerify = (e) => {
@@ -39,7 +59,6 @@ const VerifyCodeInvestor = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8 relative">
-      {/* Resend Popup */}
       {showPopup && (
         <div className="absolute top-10 right-10 bg-white border border-gray-200 rounded-xl p-5 w-[320px] shadow-md z-50">
           <div className="flex justify-end mb-2">
@@ -48,17 +67,15 @@ const VerifyCodeInvestor = () => {
           <div className="text-center">
             <div className="text-[#800080] text-2xl mb-2">✔</div>
             <p className="font-semibold text-[#800080]">Code resent to {email}</p>
-            <p className="text-sm text-gray-600">You can request again in {timer} second{timer !== 1 ? 's' : ''}</p>
+            <p className="text-sm text-gray-600">
+              You can request again in {timer} second{timer !== 1 ? 's' : ''}
+            </p>
           </div>
         </div>
       )}
 
-      {/* Main Content */}
       <div className="w-full max-w-[1000px] bg-white rounded-[24px] shadow-lg flex flex-col lg:flex-row min-h-[540px]">
-
-        {/* Left Panel */}
-        <div className="w-full lg:w-[60%] bg-card px-6 md:px-10 lg:px-20 py-10 flex justify-center 
-        rounded-b-[24px] lg:rounded-tr-none lg:rounded-br-none lg:rounded-tl-[24px] lg:rounded-bl-[24px]">
+        <div className="w-full lg:w-[60%] bg-card px-6 md:px-10 lg:px-20 py-10 flex justify-center rounded-b-[24px] lg:rounded-tr-none lg:rounded-br-none lg:rounded-tl-[24px] lg:rounded-bl-[24px]">
           <div className="w-full max-w-[530px]">
             <h2 className="text-2xl font-bold text-[#800080] mb-3 text-center">Password Reset</h2>
             <p className="text-sm text-center mb-6 text-gray-600">We sent a code to {email}</p>
@@ -68,9 +85,13 @@ const VerifyCodeInvestor = () => {
                 {code.map((value, idx) => (
                   <input
                     key={idx}
+                    type="text"
+                    inputMode="numeric"
                     maxLength="1"
                     value={value}
+                    ref={(el) => (inputRefs.current[idx] = el)}
                     onChange={(e) => handleChange(e.target.value, idx)}
+                    onKeyDown={(e) => handleKeyDown(e, idx)}
                     className="w-12 h-12 border border-gray-300 rounded text-center text-xl"
                   />
                 ))}
@@ -100,7 +121,6 @@ const VerifyCodeInvestor = () => {
           </div>
         </div>
 
-        {/* Right Panel */}
         <div
           className="w-full lg:w-[40%] bg-cover bg-center text-white flex flex-col justify-center items-center p-6 md:p-10 
           rounded-t-[24px] lg:rounded-tl-none lg:rounded-bl-none lg:rounded-tr-[24px] lg:rounded-br-[24px]"
@@ -113,7 +133,6 @@ const VerifyCodeInvestor = () => {
             </p>
           </div>
         </div>
-
       </div>
     </div>
   );
