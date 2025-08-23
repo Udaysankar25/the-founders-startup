@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import IdeaModal from "../../dashboard/pages/IdeaModal";
+import ConnectionsList from "./ConnectionsList";
+import ChatWindow from "../../components/messages/ChatWindow";
 
 // Helper to get the correct profile picture URL
 const getProfilePicUrl = (pic) => {
@@ -23,6 +25,16 @@ const Profile = () => {
   const [profileError, setProfileError] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [showFollowers, setShowFollowers] = useState(false);
+const [showFollowing, setShowFollowing] = useState(false);
+const [followers, setFollowers] = useState([]);
+const [following, setFollowing] = useState([]);
+const [showChat, setShowChat] = useState(false);
+const [selectedUser, setSelectedUser] = useState(null);
+const [showChatWindow, setShowChatWindow] = useState(false);
+
+
+
 
   const avatarInputRef = useRef();
   const bgInputRef = useRef();
@@ -158,6 +170,33 @@ const Profile = () => {
     }
   };
 
+const userFollowers = [
+  { id: 1, name: "Alice", type: "Founder", status: "HealthTech innovator", profilePicture: "https://randomuser.me/api/portraits/women/44.jpg", isFollowing: true },
+  { id: 2, name: "Bob", type: "Investor", status: "Investing in AI", profilePicture: "https://randomuser.me/api/portraits/men/23.jpg", isFollowing: false },
+];
+
+const userFollowing = [
+  { id: 3, name: "Charlie", type: "Founder", status: "EdTech startup", profilePicture: "https://randomuser.me/api/portraits/men/32.jpg", isFollowing: true },
+];
+
+// Show followers modal
+const handleShowFollowers = () => {
+  setShowFollowers(true);
+};
+
+// Show following modal
+const handleShowFollowing = () => {
+  setShowFollowing(true);
+};
+
+const handleStartChat = (user) => {
+  setSelectedUser(user);
+  setShowChatWindow(true); // show chat modal
+};
+
+
+
+
   const handlePostIdea = (newIdea) => {
     // Refresh ideas from backend after posting
     if (profile?._id) {
@@ -192,14 +231,15 @@ const Profile = () => {
     setIsModalOpen(false);
   };
 
-  const handleDeleteIdea = async (ideaId) => {
-    try {
-      const response = await fetch(`/api/ideas/${ideaId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+ const handleDeleteIdea = async (ideaId) => {
+  if (!window.confirm("Are you sure you want to delete this idea?")) {
+    return;
+  }
+  try {
+    const response = await fetch(`/api/ideas/${ideaId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
 
       const data = await response.json();
 
@@ -333,26 +373,90 @@ const Profile = () => {
                 {profile?.headline || "“Turning ideas into impact”"}
               </p>
               {/* Stats */}
-              <div className="flex gap-8 mt-4">
-                <div className="flex flex-col items-center">
-                  <span className="text-2xl font-bold text-white drop-shadow-lg">
-                    {profile?.ideasCount ?? 0}
-                  </span>
-                  <span className="text-sm text-purple-100">Ideas</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-2xl font-bold text-white drop-shadow-lg">
-                    {profile?.teamsCount ?? 0}
-                  </span>
-                  <span className="text-sm text-purple-100">Teams</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-2xl font-bold text-white drop-shadow-lg">
-                    {profile?.startupsCount ?? 0}
-                  </span>
-                  <span className="text-sm text-purple-100">Startups</span>
-                </div>
-              </div>
+<div className="flex justify-center gap-10 mt-4">
+  {/* Followers */}
+  <div
+    className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
+    onClick={handleShowFollowers}
+  >
+    <span className="text-2xl font-bold text-white drop-shadow-lg">
+      {followers.length}
+    </span>
+    <span className="text-sm text-purple-100">Followers</span>
+  </div>
+
+  {/* Following */}
+  <div
+    className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
+    onClick={handleShowFollowing}
+  >
+    <span className="text-2xl font-bold text-white drop-shadow-lg">
+      {following.length}
+    </span>
+    <span className="text-sm text-purple-100">Following</span>
+  </div>
+
+  {/* Ideas */}
+  <div className="flex flex-col items-center">
+    <span className="text-2xl font-bold text-white drop-shadow-lg">
+      {profile?.ideasCount ?? 0}
+    </span>
+    <span className="text-sm text-purple-100">Ideas</span>
+  </div>
+
+  {/* Startups */}
+  <div className="flex flex-col items-center">
+    <span className="text-2xl font-bold text-white drop-shadow-lg">
+      {profile?.startupsCount ?? 0}
+    </span>
+    <span className="text-sm text-purple-100">Startups</span>
+  </div>
+</div>
+
+
+{showFollowers && (
+  <ConnectionsList
+    title="Followers"
+    connectionsData={userFollowers}
+    onClose={() => setShowFollowers(false)}
+    onStartChat={handleStartChat}
+  />
+)}
+
+{showFollowing && (
+  <ConnectionsList
+    title="Following"
+    connectionsData={userFollowing}
+    onClose={() => setShowFollowing(false)}
+    onStartChat={handleStartChat}
+  />
+)}
+
+{showChatWindow && selectedUser && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-2 md:p-4">
+    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl md:max-w-2xl h-[90vh] md:h-[80vh] flex flex-col overflow-hidden">
+      {/* Chat header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <button
+          onClick={() => setShowChatWindow(false)}
+          className="text-purple-700 text-base font-semibold"
+        >
+          &larr; Back
+        </button>
+        <h3 className="text-lg font-bold text-purple-900 truncate max-w-[60%] md:max-w-[70%]">
+          {selectedUser.name}
+        </h3>
+        <div /> {/* Placeholder for alignment */}
+      </div>
+
+      {/* Chat content */}
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4">
+        <ChatWindow chat={{ user: selectedUser, messages: [] }} onSendMessage={() => {}} />
+      </div>
+    </div>
+  </div>
+)}
+
             </div>
           </div>
         </div>

@@ -10,11 +10,14 @@ const ChatApp = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Responsive state for mobile view
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [showSidebar, setShowSidebar] = useState(true);
+
   // Forward UI state
   const [forwardMode, setForwardMode] = useState(false);
   const [forwardText, setForwardText] = useState("");
 
-  // Fetch conversations on component mount
   useEffect(() => {
     // Check if user is logged in
     const token = localStorage.getItem("token");
@@ -34,6 +37,21 @@ const ChatApp = () => {
     }
 
     fetchConversations();
+  }, []);
+
+  // New useEffect to handle window resizing
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobileSize = window.innerWidth < 768;
+      setIsMobile(isMobileSize);
+      // On desktop, we always show the sidebar and chat panel
+      if (!isMobileSize) {
+        setShowSidebar(true);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const fetchConversations = async () => {
@@ -75,9 +93,20 @@ const ChatApp = () => {
           conv.id === chat.id ? { ...conv, unread: 0 } : conv
         )
       );
+
+      // On mobile, hide the sidebar when a user is selected
+      if (isMobile) {
+        setShowSidebar(false);
+      }
     } catch (err) {
       console.error("Failed to fetch messages:", err);
     }
+  };
+
+  const handleBackToSidebar = () => {
+    // Function to go back to the sidebar on mobile
+    setSelectedChat(null);
+    setShowSidebar(true);
   };
 
   const handleSendMessage = async (content, replyMeta = null) => {
@@ -252,69 +281,77 @@ const ChatApp = () => {
   return (
     <div className="chat-app-wrapper">
       <div className="chat-layout">
-        <div className="sidebar-wrapper">
-          <Sidebar
-            chats={conversations}
-            onSelectUser={handleUserSelect}
-            onNewConversation={handleNewConversation}
-            onDeleteConversation={handleDeleteConversation}
-          />
-        </div>
+        {/* Only show the sidebar if we're on a desktop or if showSidebar is true on mobile */}
+        {showSidebar && (
+          <div className="sidebar-wrapper">
+            <Sidebar
+              chats={conversations}
+              onSelectUser={handleUserSelect}
+              onNewConversation={handleNewConversation}
+              onDeleteConversation={handleDeleteConversation}
+            />
+          </div>
+        )}
 
-        <div className="chat-panel">
-          {selectedChat ? (
-            <>
-              <ChatWindow
-                chat={selectedChat}
-                onSendMessage={handleSendMessage}
-                onDeleteMessageForMe={handleDeleteMessageForMe}
-                onDeleteMessageForEveryone={handleDeleteMessageForEveryone}
-                onForward={beginForward}
-              />
-              {forwardMode && (
-                <div className="forward-overlay">
-                  <div className="forward-modal">
-                    <div className="forward-header">
-                      <span>Forward message</span>
+        {/* Show the chat panel only if a chat is selected or on a desktop */}
+        {selectedChat && (
+          <div className="chat-panel">
+            <ChatWindow
+              chat={selectedChat}
+              onSendMessage={handleSendMessage}
+              onDeleteMessageForMe={handleDeleteMessageForMe}
+              onDeleteMessageForEveryone={handleDeleteMessageForEveryone}
+              onForward={beginForward}
+              onBack={isMobile ? handleBackToSidebar : null} // Pass the back handler only for mobile
+            />
+            {forwardMode && (
+              <div className="forward-overlay">
+                <div className="forward-modal">
+                  <div className="forward-header">
+                    <span>Forward message</span>
+                    <button
+                      className="forward-close"
+                      onClick={() => setForwardMode(false)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="forward-preview">{forwardText}</div>
+                  <div className="forward-list">
+                    {conversations.map((conv) => (
                       <button
-                        className="forward-close"
-                        onClick={() => setForwardMode(false)}
+                        key={conv.id}
+                        className="forward-item"
+                        onClick={() => sendForwardToConversation(conv.id)}
                       >
-                        ✕
-                      </button>
-                    </div>
-                    <div className="forward-preview">{forwardText}</div>
-                    <div className="forward-list">
-                      {conversations.map((conv) => (
-                        <button
-                          key={conv.id}
-                          className="forward-item"
-                          onClick={() => sendForwardToConversation(conv.id)}
-                        >
-                          <img
-                            src={conv.avatar}
-                            className="avatar-img"
-                            alt="avatar"
-                          />
-                          <div className="forward-info">
-                            <div className="forward-name">{conv.name}</div>
-                            <div className="forward-last">
-                              {conv.lastMessage || ""}
-                            </div>
+                        <img
+                          src={conv.avatar}
+                          className="avatar-img"
+                          alt="avatar"
+                        />
+                        <div className="forward-info">
+                          <div className="forward-name">{conv.name}</div>
+                          <div className="forward-last">
+                            {conv.lastMessage || ""}
                           </div>
-                        </button>
-                      ))}
-                    </div>
+                        </div>
+                      </button>
+                    ))}
                   </div>
                 </div>
-              )}
-            </>
-          ) : (
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Show this on desktop when no chat is selected */}
+        {!selectedChat && !isMobile && (
+          <div className="chat-panel">
             <div className="empty-chat-window">
               <p>Select a conversation to start chatting</p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

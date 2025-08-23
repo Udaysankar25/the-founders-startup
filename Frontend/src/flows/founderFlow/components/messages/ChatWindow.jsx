@@ -9,6 +9,7 @@ const ChatWindow = ({
   onDeleteMessageForMe,
   onDeleteMessageForEveryone,
   onForward,
+  onBack,
 }) => {
   const [messages, setMessages] = useState(chat.messages || []);
   const [replyTo, setReplyTo] = useState(null);
@@ -28,7 +29,6 @@ const ChatWindow = ({
 
   const handleSend = async (text) => {
     if (!onSendMessage) return;
-
     try {
       await onSendMessage(
         text,
@@ -37,7 +37,6 @@ const ChatWindow = ({
           : null
       );
       setReplyTo(null);
-      // The parent component will update the messages
     } catch (err) {
       console.error("Failed to send message:", err);
     }
@@ -49,7 +48,8 @@ const ChatWindow = ({
 
   return (
     <div className="chat-window">
-      <ChatHeader name={chat.name} avatar={chat.avatar} />
+      {/* Pass the onBack prop to ChatHeader */}
+      <ChatHeader name={chat.name} avatar={chat.avatar} onBack={onBack} />
       <div className="messages-list">
         {messages.map((msg) => (
           <MessageBubble

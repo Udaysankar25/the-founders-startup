@@ -544,3 +544,28 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Add to your chat.css file */
+.chat-header {
+  position: relative;
+  /* ... other styles */
+}
+
+.back-btn {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #fff; /* Or whatever color you prefer */
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Ensure the back button is only visible on mobile */
+@media (min-width: 768px) {
+  .back-btn {
+    display: none;
+  }
+}

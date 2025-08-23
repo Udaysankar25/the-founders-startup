@@ -9,7 +9,7 @@ import {
   FiPaperclip,
 } from "react-icons/fi";
 import { FaThumbsUp } from "react-icons/fa";
-import apiCall from "../../../utils/api.js";
+import UserProfilePopup from "../dashboard/pages/UserProfilePopup"; // Import the popup component
 
 const PostCard = ({ post, onDelete }) => {
   const [liked, setLiked] = useState(
@@ -25,14 +25,13 @@ const PostCard = ({ post, onDelete }) => {
   const [comments, setComments] = useState(post.comments || []);
   const [commentSort, setCommentSort] = useState("newest"); // "newest" or "top"
 
-  // Check if current user is the author (for internal use)
-  const currentUser = JSON.parse(localStorage.getItem("user"));
-  // eslint-disable-next-line no-unused-vars
-  const isAuthor = post.author?._id === currentUser?._id;
+  // Popup state for user profile
+  const [showProfile, setShowProfile] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Helper to get the correct profile picture URL
   const getProfilePicUrl = (pic) => {
-    if (!pic) return "https://randomuser.me/api/portraits/women/44.jpg";
+    if (!pic) return "https://randomuser.me/api/portraits/men/44.jpg";
     if (pic.startsWith("http")) return pic;
     return `http://localhost:5000${pic}`;
   };
@@ -49,23 +48,47 @@ const PostCard = ({ post, onDelete }) => {
     const now = new Date();
     const commentTime = new Date(timestamp);
     const diffInHours = Math.floor((now - commentTime) / (1000 * 60 * 60));
-
     if (diffInHours < 1) return "Just now";
     if (diffInHours === 1) return "1 hour ago";
     if (diffInHours < 24) return `${diffInHours} hours ago`;
-
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays === 1) return "1 day ago";
     return `${diffInDays} days ago`;
   };
 
+  // Show popup with mock data when profile clicked
+  const handleProfileClick = () => {
+    setSelectedUser({
+      name: post.author?.name || "Anonymous",
+      profilePicture: post.author?.profilePicture || "https://randomuser.me/api/portraits/men/44.jpg",
+      bio: "Passionate about sustainable food systems and building smarter cities.",
+      followers: "12k",
+      following: "3k",
+      ideas: "12",
+      startups: "5",
+      about: "I invest in bold student-led ventures solving real problems through AI, sustainability, and education. Passionate about early-stage ideas with scalable impact.",
+      interests: ["AgriTech", "StartupFounder", "StudentInnovation"],
+      skills: [
+        "Market Analysis",
+        "Early-Stage Investing",
+        "Financial Modeling",
+        "Startup Mentorship"
+      ]
+    });
+    setShowProfile(true);
+  };
+
+  const closeProfile = () => {
+    setShowProfile(false);
+    setSelectedUser(null);
+  };
+
   const toggleLike = async () => {
     try {
       setLoading(true);
-      const data = await apiCall(`/api/ideas/${post._id}/like`, "POST");
-
-      setLiked(data.isLiked);
-      setLikeCount(data.likeCount);
+      // You can add API logic here when backend is ready
+      setLiked((prev) => !prev);
+      setLikeCount((count) => liked ? count - 1 : count + 1);
     } catch (error) {
       console.error("Like error:", error);
     } finally {
@@ -79,7 +102,6 @@ const PostCard = ({ post, onDelete }) => {
       text: post.description,
       url: window.location.href,
     };
-
     try {
       if (navigator.share) {
         await navigator.share(shareData);
@@ -94,15 +116,20 @@ const PostCard = ({ post, onDelete }) => {
 
   const handleAddComment = async () => {
     if (!commentText.trim()) return;
-
     try {
       setCommentLoading(true);
-      const data = await apiCall(`/api/ideas/${post._id}/comment`, "POST", {
-        text: commentText.trim(),
-      });
-
-      // Add the new comment to the comments array
-      setComments((prev) => [...prev, data.comment]);
+      // You can add API logic here when backend is ready
+      setComments((prev) => [
+        ...prev,
+        {
+          _id: Math.random().toString(),
+          text: commentText.trim(),
+          createdAt: new Date(),
+          user: { name: "You", profilePicture: "https://randomuser.me/api/portraits/men/44.jpg" },
+          likes: [],
+          replies: []
+        }
+      ]);
       setCommentText("");
     } catch (error) {
       console.error("Comment error:", error);
@@ -114,15 +141,7 @@ const PostCard = ({ post, onDelete }) => {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      console.log("Attempting to delete comment:", commentId);
-
-      await apiCall(`/api/ideas/${post._id}/comment/${commentId}`, "DELETE");
-
-      console.log("Comment deleted successfully, refreshing data");
-
-      // Refresh the entire post to get updated comments
-      const postData = await apiCall(`/api/ideas/${post._id}`);
-      setComments(postData.idea.comments || []);
+      setComments(comments.filter(c => c._id !== commentId));
     } catch (error) {
       console.error("Delete comment error:", error);
       alert("Failed to delete comment: " + error.message);
@@ -130,255 +149,261 @@ const PostCard = ({ post, onDelete }) => {
   };
 
   const handleLikeComment = async (commentId) => {
-    // This would need a backend endpoint for liking comments
-    // For now, just toggle the UI state
     console.log("Like comment:", commentId);
   };
 
   const handleReplyToComment = async (commentId, replyText) => {
     if (!replyText.trim()) return;
-
-    try {
-      // Use the new API utility
-      await apiCall(
-        `/api/ideas/${post._id}/comment/${commentId}/reply`,
-        "POST",
-        {
-          text: replyText.trim(),
+    setComments(comments.map((c) => {
+      if (c._id === commentId) {
+        return {
+          ...c,
+          replies: [
+            ...(c.replies || []),
+            {
+              _id: Math.random().toString(),
+              text: replyText.trim(),
+              createdAt: new Date(),
+              user: { name: "You", profilePicture: "https://randomuser.me/api/portraits/men/44.jpg" },
+              likes: []
+            }
+          ]
         }
-      );
-
-      // Refresh the entire post to get updated comments with replies
-      const postData = await apiCall(`/api/ideas/${post._id}`);
-      setComments(postData.idea.comments || []);
-    } catch (error) {
-      console.error("Reply error:", error);
-      alert("Failed to add reply: " + error.message);
-    }
+      }
+      return c;
+    }));
   };
 
-  // Sort comments based on selected option
+  // Sort comments
   const sortedComments = [...comments].sort((a, b) => {
     if (commentSort === "newest") {
       return new Date(b.createdAt) - new Date(a.createdAt);
     }
-    // For "top" sorting, you might want to sort by likes
     return (b.likes?.length || 0) - (a.likes?.length || 0);
   });
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg mb-6 p-6 border border-purple-100 transition hover:shadow-xl duration-300">
-      {/* User Info */}
-      <div className="flex items-center mb-4">
-        <img
-          src={getProfilePicUrl(post.author?.profilePicture)}
-          alt={post.author?.name || "User"}
-          className="w-11 h-11 rounded-full ring-2 ring-purple-200 mr-3 object-cover"
-        />
-        <div>
-          <p className="font-semibold text-primary">
-            {post.author?.name || "Anonymous"}
-          </p>
-          <p className="text-xs text-gray-500">
-            {new Date(post.createdAt).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </p>
-        </div>
-        <div className="ml-auto flex items-center gap-2">
-          <button className="text-primary text-sm font-semibold hover:underline">
-            + Follow
-          </button>
-        </div>
-      </div>
-
-      {/* Title */}
-      <h3 className="text-lg font-bold text-gray-800 mb-2">{post.title}</h3>
-
-      {/* Description */}
-      <p className="text-sm text-gray-600 leading-relaxed mb-4">
-        {post.description}
-      </p>
-
-      {/* Funding */}
-      {post.funding && (
-        <div className="flex items-center gap-2 text-sm font-medium text-purple-700 bg-purple-50 px-4 py-2 rounded-xl mb-4 w-fit">
-          <FiTrendingUp className="text-lg" />
-          Funding Goal: ₹{post.funding}
-        </div>
-      )}
-
-      {/* Tags */}
-      {post.tags?.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {post.tags.map((tag, idx) => (
-            <span
-              key={idx}
-              className="bg-purple-100 text-primary text-xs px-3 py-1 rounded-full font-medium"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* Attachments */}
-      {post.coverImage && (
-        <img
-          src={getAttachmentUrl(post.coverImage)}
-          alt="Idea Cover"
-          className="mt-2 rounded-xl w-full max-h-[400px] object-cover"
-        />
-      )}
-
-      {/* Pitch Deck Link */}
-      {post.pitchDeck && (
-        <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-          <div className="flex items-center gap-2">
-            <svg
-              className="w-5 h-5 text-blue-600"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span className="text-sm font-medium text-blue-800">
-              Pitch Deck
-            </span>
-          </div>
-          <a
-            href={getAttachmentUrl(post.pitchDeck)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-blue-600 hover:text-blue-800 underline mt-1 block"
+    <>
+      <div className="bg-white rounded-2xl shadow-lg mb-6 p-6 border border-purple-100 transition hover:shadow-xl duration-300">
+        {/* User Info */}
+        <div className="flex items-center mb-4">
+          <button
+            onClick={handleProfileClick}
+            className="flex items-center focus:outline-none p-0 m-0 bg-transparent border-none cursor-pointer"
+            type="button"
           >
-            View Pitch Deck
-          </a>
-        </div>
-      )}
-
-      {/* Video */}
-      {post.video && (
-        <div className="mt-3">
-          <video
-            controls
-            className="w-full rounded-lg"
-            src={getAttachmentUrl(post.video)}
-          >
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="flex justify-between items-center pt-4 mt-4 border-t border-purple-100 text-sm text-primary">
-        <button
-          onClick={toggleLike}
-          disabled={loading}
-          className="flex items-center gap-1 font-medium hover:text-primary disabled:opacity-50"
-        >
-          <span className="text-lg transition-transform hover:scale-110">
-            {liked ? <FaThumbsUp className="text-primary" /> : <FiThumbsUp />}
-          </span>
-          Like {likeCount > 0 && `(${likeCount})`}
-        </button>
-
-        <button
-          onClick={() => setShowComments(!showComments)}
-          className="flex items-center gap-1 font-medium hover:text-primary transition"
-        >
-          <span className="text-lg group-hover:scale-110 transition-transform">
-            <FiMessageCircle />
-          </span>
-          Comment {comments.length > 0 && `(${comments.length})`}
-        </button>
-
-        <ActionButton icon={<FiShare2 />} label="Share" onClick={handleShare} />
-        <ActionButton icon={<FiTrendingUp />} label="Invest" />
-      </div>
-
-      {/* Comments Section */}
-      {showComments && (
-        <div className="mt-6 pt-4 border-t border-purple-100">
-          {/* Comment Input */}
-          <div className="flex items-start gap-3 mb-4">
             <img
-              src={getProfilePicUrl(
-                JSON.parse(localStorage.getItem("user"))?.profilePicture
-              )}
-              alt="Your Avatar"
-              className="w-8 h-8 rounded-full object-cover"
+              src={getProfilePicUrl(post.author?.profilePicture)}
+              alt={post.author?.name || "User"}
+              className="w-11 h-11 rounded-full ring-2 ring-purple-200 mr-3 object-cover"
             />
-            <div className="flex-1 relative">
-              <input
-                type="text"
-                placeholder="Add a comment..."
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleAddComment()}
-                className="w-full px-4 py-2 border border-purple-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent pr-16"
-                disabled={commentLoading}
-              />
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-                <button className="text-gray-400 hover:text-gray-600">
-                  <FiSmile className="w-4 h-4" />
-                </button>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <FiPaperclip className="w-4 h-4" />
-                </button>
-              </div>
+            <div>
+              <p className="font-semibold text-primary">
+                {post.author?.name || "Anonymous"}
+              </p>
+              <p className="text-xs text-gray-500">
+                {new Date(post.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
             </div>
-          </div>
-
-          {/* Comment Sorting */}
-          <div className="flex gap-4 mb-4">
-            <button
-              onClick={() => setCommentSort("newest")}
-              className={`text-sm font-medium ${
-                commentSort === "newest" ? "text-purple-600" : "text-gray-500"
-              }`}
-            >
-              Newest
-            </button>
-            <button
-              onClick={() => setCommentSort("top")}
-              className={`text-sm font-medium ${
-                commentSort === "top" ? "text-purple-600" : "text-gray-500"
-              }`}
-            >
-              Top
+          </button>
+          <div className="ml-auto flex items-center gap-2">
+            <button className="text-primary text-sm font-semibold hover:underline">
+              + Follow
             </button>
           </div>
+        </div>
 
-          {/* Comments List */}
-          <div className="space-y-4">
-            {sortedComments.map((comment) => (
-              <RecursiveCommentItem
-                key={comment._id}
-                comment={comment}
-                onDelete={handleDeleteComment}
-                onLike={handleLikeComment}
-                onReply={(commentId, replyText) =>
-                  handleReplyToComment(commentId, replyText)
-                }
-                formatTimestamp={formatTimestamp}
-                getProfilePicUrl={getProfilePicUrl}
-                currentUserId={JSON.parse(localStorage.getItem("user"))?._id}
-                ideaAuthorId={post.author?._id}
-                depth={0}
-              />
+        {/* Title */}
+        <h3 className="text-lg font-bold text-gray-800 mb-2">{post.title}</h3>
+
+        {/* Description */}
+        <p className="text-sm text-gray-600 leading-relaxed mb-4">{post.description}</p>
+
+        {/* Funding */}
+        {post.funding && (
+          <div className="flex items-center gap-2 text-sm font-medium text-purple-700 bg-purple-50 px-4 py-2 rounded-xl mb-4 w-fit">
+            <FiTrendingUp className="text-lg" />
+            Funding Goal: ₹{post.funding}
+          </div>
+        )}
+
+        {/* Tags */}
+        {post.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {post.tags.map((tag, idx) => (
+              <span
+                key={idx}
+                className="bg-purple-100 text-primary text-xs px-3 py-1 rounded-full font-medium"
+              >
+                #{tag}
+              </span>
             ))}
           </div>
+        )}
+
+        {/* Attachments */}
+        {post.coverImage && (
+          <img
+            src={getAttachmentUrl(post.coverImage)}
+            alt="Idea Cover"
+            className="mt-2 rounded-xl w-full max-h-[400px] object-cover"
+          />
+        )}
+
+        {/* Pitch Deck Link */}
+        {post.pitchDeck && (
+          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-center gap-2">
+              <svg
+                className="w-5 h-5 text-blue-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-sm font-medium text-blue-800">Pitch Deck</span>
+            </div>
+            <a
+              href={getAttachmentUrl(post.pitchDeck)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-blue-600 hover:text-blue-800 underline mt-1 block"
+            >
+              View Pitch Deck
+            </a>
+          </div>
+        )}
+
+        {/* Video */}
+        {post.video && (
+          <div className="mt-3">
+            <video
+              controls
+              className="w-full rounded-lg"
+              src={getAttachmentUrl(post.video)}
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex justify-between items-center pt-4 mt-4 border-t border-purple-100 text-sm text-primary">
+          <button
+            onClick={toggleLike}
+            disabled={loading}
+            className="flex items-center gap-1 font-medium hover:text-primary disabled:opacity-50"
+          >
+            <span className="text-lg transition-transform hover:scale-110">
+              {liked ? <FaThumbsUp className="text-primary" /> : <FiThumbsUp />}
+            </span>
+            Like {likeCount > 0 && `(${likeCount})`}
+          </button>
+
+          <button
+            onClick={() => setShowComments(!showComments)}
+            className="flex items-center gap-1 font-medium hover:text-primary transition"
+          >
+            <span className="text-lg group-hover:scale-110 transition-transform">
+              <FiMessageCircle />
+            </span>
+            Comment {comments.length > 0 && `(${comments.length})`}
+          </button>
+
+          <ActionButton icon={<FiShare2 />} label="Share" onClick={handleShare} />
+          <ActionButton icon={<FiTrendingUp />} label="Invest" />
         </div>
+
+        {/* Comments Section */}
+        {showComments && (
+          <div className="mt-6 pt-4 border-t border-purple-100">
+            {/* Comment Input */}
+            <div className="flex items-start gap-3 mb-4">
+              <img
+                src={getProfilePicUrl(
+                  JSON.parse(localStorage.getItem("user"))?.profilePicture
+                )}
+                alt="Your Avatar"
+                className="w-8 h-8 rounded-full object-cover"
+              />
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="Add a comment..."
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleAddComment()}
+                  className="w-full px-4 py-2 border border-purple-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent pr-16"
+                  disabled={commentLoading}
+                />
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <FiSmile className="w-4 h-4" />
+                  </button>
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <FiPaperclip className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Comment Sorting */}
+            <div className="flex gap-4 mb-4">
+              <button
+                onClick={() => setCommentSort("newest")}
+                className={`text-sm font-medium ${
+                  commentSort === "newest" ? "text-purple-600" : "text-gray-500"
+                }`}
+              >
+                Newest
+              </button>
+              <button
+                onClick={() => setCommentSort("top")}
+                className={`text-sm font-medium ${
+                  commentSort === "top" ? "text-purple-600" : "text-gray-500"
+                }`}
+              >
+                Top
+              </button>
+            </div>
+
+            {/* Comments List */}
+            <div className="space-y-4">
+              {sortedComments.map((comment) => (
+                <RecursiveCommentItem
+                  key={comment._id}
+                  comment={comment}
+                  onDelete={handleDeleteComment}
+                  onLike={handleLikeComment}
+                  onReply={(commentId, replyText) =>
+                    handleReplyToComment(commentId, replyText)
+                  }
+                  formatTimestamp={formatTimestamp}
+                  getProfilePicUrl={getProfilePicUrl}
+                  currentUserId={JSON.parse(localStorage.getItem("user"))?._id}
+                  ideaAuthorId={post.author?._id}
+                  depth={0}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* User profile popup */}
+      {showProfile && selectedUser && (
+        <UserProfilePopup user={selectedUser} onClose={closeProfile} />
       )}
-    </div>
+    </>
   );
 };
 
@@ -548,9 +573,7 @@ const RecursiveCommentItem = ({
                 liked ? "text-purple-600" : "text-gray-500"
               } hover:text-purple-600`}
             >
-              <FiThumbsUp
-                className={`w-3 h-3 ${liked ? "fill-current" : ""}`}
-              />
+              <FiThumbsUp className={`w-3 h-3 ${liked ? "fill-current" : ""}`} />
               Like {likeCount > 0 && `(${likeCount})`}
             </button>
             <button
