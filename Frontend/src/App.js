@@ -42,6 +42,12 @@ import InvestorMessagesPage from './flows/investorFlow/dashboard/pages/MessagesP
 import InvestorNotificationsPage from './flows/investorFlow/dashboard/pages/NotificationsPage';
 import InvestorProfilePage from './flows/investorFlow/dashboard/pages/ProfilePage';
 import InvestorEditProfile from './flows/investorFlow/dashboard/pages/InvestorEditProfile'; // Uncomment if needed
+import UserProfilePage from './flows/investorFlow/dashboard/pages/UserProfilePage';
+import ConnectionsPage from './flows/investorFlow/dashboard/pages/ConnectionsPage';
+
+// Founder Flow additional pages
+import FounderUserProfilePage from './flows/founderFlow/dashboard/pages/UserProfilePage';
+import FounderConnectionsPage from './flows/founderFlow/dashboard/pages/ConnectionsPage';
 
 
 function App() {
@@ -73,6 +79,8 @@ function App() {
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="profile/edit" element={<UpdateProfile />} />
+          <Route path="user/:userId" element={<FounderUserProfilePage />} />
+          <Route path="connections" element={<FounderConnectionsPage />} />
         </Route>
 
         {/* Investor Routes */}
@@ -96,6 +104,8 @@ function App() {
           <Route path="notifications" element={<InvestorNotificationsPage />} />
           <Route path="profile" element={<InvestorProfilePage />} />
           <Route path="profile/edit" element={<InvestorEditProfile />} />
+          <Route path="user/:userId" element={<UserProfilePage />} />
+          <Route path="connections" element={<ConnectionsPage />} />
         </Route>
 
         {/* Catch-all route for 404 */}

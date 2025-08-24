@@ -42,6 +42,32 @@ const ChatWindow = ({
     }
   };
 
+  const handleSendFile = (file) => {
+    const newMsg = {
+      id: Date.now(),
+      sender: 'me',
+      type: 'file',
+      fileName: file.name,
+      fileSize: file.size,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setMessages(prev => [...prev, newMsg]);
+  };
+
+  const handleSendImage = (file) => {
+    const newMsg = {
+      id: Date.now(),
+      sender: 'me',
+      type: 'image',
+      imageUrl: URL.createObjectURL(file),
+      fileName: file.name,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setMessages(prev => [...prev, newMsg]);
+  };
+
   const handleReply = (msg) => {
     setReplyTo(msg);
   };
@@ -70,6 +96,8 @@ const ChatWindow = ({
       </div>
       <MessageInput
         onSend={handleSend}
+        onSendFile={handleSendFile}
+        onSendImage={handleSendImage}
         replyTo={replyTo}
         onCancelReply={() => setReplyTo(null)}
       />

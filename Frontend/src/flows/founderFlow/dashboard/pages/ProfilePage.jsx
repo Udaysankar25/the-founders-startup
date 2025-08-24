@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import IdeaModal from "../../dashboard/pages/IdeaModal";
-import ConnectionsList from "./ConnectionsList";
-import ChatWindow from "../../components/messages/ChatWindow";
 
 // Helper to get the correct profile picture URL
 const getProfilePicUrl = (pic) => {
@@ -18,6 +17,7 @@ const getBackgroundUrl = (bg) => {
 };
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [avatar, setAvatar] = useState(null);
   const [bgImage, setBgImage] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,13 +25,6 @@ const Profile = () => {
   const [profileError, setProfileError] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
-  const [showFollowers, setShowFollowers] = useState(false);
-const [showFollowing, setShowFollowing] = useState(false);
-const [followers, setFollowers] = useState([]);
-const [following, setFollowing] = useState([]);
-const [showChat, setShowChat] = useState(false);
-const [selectedUser, setSelectedUser] = useState(null);
-const [showChatWindow, setShowChatWindow] = useState(false);
 
 
 
@@ -170,6 +163,7 @@ const [showChatWindow, setShowChatWindow] = useState(false);
     }
   };
 
+// Mock data for followers and following counts
 const userFollowers = [
   { id: 1, name: "Alice", type: "Founder", status: "HealthTech innovator", profilePicture: "https://randomuser.me/api/portraits/women/44.jpg", isFollowing: true },
   { id: 2, name: "Bob", type: "Investor", status: "Investing in AI", profilePicture: "https://randomuser.me/api/portraits/men/23.jpg", isFollowing: false },
@@ -179,19 +173,18 @@ const userFollowing = [
   { id: 3, name: "Charlie", type: "Founder", status: "EdTech startup", profilePicture: "https://randomuser.me/api/portraits/men/32.jpg", isFollowing: true },
 ];
 
-// Show followers modal
+// Navigate to connections page
 const handleShowFollowers = () => {
-  setShowFollowers(true);
+  navigate('/founder/dashboard/connections?type=followers');
 };
 
-// Show following modal
+// Navigate to connections page
 const handleShowFollowing = () => {
-  setShowFollowing(true);
+  navigate('/founder/dashboard/connections?type=following');
 };
 
 const handleStartChat = (user) => {
-  setSelectedUser(user);
-  setShowChatWindow(true); // show chat modal
+  navigate(`/founder/dashboard/messages?user=${user.id}&name=${user.name}`);
 };
 
 
@@ -380,7 +373,7 @@ const handleStartChat = (user) => {
     onClick={handleShowFollowers}
   >
     <span className="text-2xl font-bold text-white drop-shadow-lg">
-      {followers.length}
+      {userFollowers.length}
     </span>
     <span className="text-sm text-purple-100">Followers</span>
   </div>
@@ -391,7 +384,7 @@ const handleStartChat = (user) => {
     onClick={handleShowFollowing}
   >
     <span className="text-2xl font-bold text-white drop-shadow-lg">
-      {following.length}
+      {userFollowing.length}
     </span>
     <span className="text-sm text-purple-100">Following</span>
   </div>
@@ -414,48 +407,7 @@ const handleStartChat = (user) => {
 </div>
 
 
-{showFollowers && (
-  <ConnectionsList
-    title="Followers"
-    connectionsData={userFollowers}
-    onClose={() => setShowFollowers(false)}
-    onStartChat={handleStartChat}
-  />
-)}
 
-{showFollowing && (
-  <ConnectionsList
-    title="Following"
-    connectionsData={userFollowing}
-    onClose={() => setShowFollowing(false)}
-    onStartChat={handleStartChat}
-  />
-)}
-
-{showChatWindow && selectedUser && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-2 md:p-4">
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl md:max-w-2xl h-[90vh] md:h-[80vh] flex flex-col overflow-hidden">
-      {/* Chat header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <button
-          onClick={() => setShowChatWindow(false)}
-          className="text-purple-700 text-base font-semibold"
-        >
-          &larr; Back
-        </button>
-        <h3 className="text-lg font-bold text-purple-900 truncate max-w-[60%] md:max-w-[70%]">
-          {selectedUser.name}
-        </h3>
-        <div /> {/* Placeholder for alignment */}
-      </div>
-
-      {/* Chat content */}
-      <div className="flex-1 overflow-y-auto p-2 sm:p-4">
-        <ChatWindow chat={{ user: selectedUser, messages: [] }} onSendMessage={() => {}} />
-      </div>
-    </div>
-  </div>
-)}
 
             </div>
           </div>

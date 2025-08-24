@@ -4,7 +4,7 @@ import ChatWindow from "./ChatWindow";
 import { apiCall } from "../../../../utils/api.js";
 import "./chat.css";
 
-const ChatApp = () => {
+const ChatApp = ({ initialUser }) => {
   const [conversations, setConversations] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -38,6 +38,28 @@ const ChatApp = () => {
 
     fetchConversations();
   }, []);
+
+  // Handle initialUser prop to pre-select a chat
+  useEffect(() => {
+    if (initialUser && conversations.length > 0) {
+      // Find existing chat with this user
+      const existingChat = conversations.find(chat => chat.id === initialUser.id);
+      
+      if (existingChat) {
+        setSelectedChat(existingChat);
+      } else {
+        // Create a mock chat if none exists
+        const mockChat = {
+          id: initialUser.id,
+          name: initialUser.name,
+          profilePicture: "https://randomuser.me/api/portraits/men/44.jpg",
+          messages: [],
+          unread: 0
+        };
+        setSelectedChat(mockChat);
+      }
+    }
+  }, [initialUser, conversations]);
 
   // New useEffect to handle window resizing
   useEffect(() => {
@@ -289,6 +311,7 @@ const ChatApp = () => {
               onSelectUser={handleUserSelect}
               onNewConversation={handleNewConversation}
               onDeleteConversation={handleDeleteConversation}
+              selectedChat={selectedChat}
             />
           </div>
         )}

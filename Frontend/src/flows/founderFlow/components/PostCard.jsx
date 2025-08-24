@@ -9,9 +9,10 @@ import {
   FiPaperclip,
 } from "react-icons/fi";
 import { FaThumbsUp } from "react-icons/fa";
-import UserProfilePopup from "../dashboard/pages/UserProfilePopup"; // Import the popup component
+import { useNavigate } from "react-router-dom";
 
 const PostCard = ({ post, onDelete }) => {
+  const navigate = useNavigate();
   const [liked, setLiked] = useState(
     post.likes?.includes(JSON.parse(localStorage.getItem("user"))?._id) || false
   );
@@ -24,10 +25,6 @@ const PostCard = ({ post, onDelete }) => {
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState(post.comments || []);
   const [commentSort, setCommentSort] = useState("newest"); // "newest" or "top"
-
-  // Popup state for user profile
-  const [showProfile, setShowProfile] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
 
   // Helper to get the correct profile picture URL
   const getProfilePicUrl = (pic) => {
@@ -56,31 +53,9 @@ const PostCard = ({ post, onDelete }) => {
     return `${diffInDays} days ago`;
   };
 
-  // Show popup with mock data when profile clicked
+  // Navigate to user profile when profile clicked
   const handleProfileClick = () => {
-    setSelectedUser({
-      name: post.author?.name || "Anonymous",
-      profilePicture: post.author?.profilePicture || "https://randomuser.me/api/portraits/men/44.jpg",
-      bio: "Passionate about sustainable food systems and building smarter cities.",
-      followers: "12k",
-      following: "3k",
-      ideas: "12",
-      startups: "5",
-      about: "I invest in bold student-led ventures solving real problems through AI, sustainability, and education. Passionate about early-stage ideas with scalable impact.",
-      interests: ["AgriTech", "StartupFounder", "StudentInnovation"],
-      skills: [
-        "Market Analysis",
-        "Early-Stage Investing",
-        "Financial Modeling",
-        "Startup Mentorship"
-      ]
-    });
-    setShowProfile(true);
-  };
-
-  const closeProfile = () => {
-    setShowProfile(false);
-    setSelectedUser(null);
+    navigate(`/founder/dashboard/user/${post.author?._id || post.id}`);
   };
 
   const toggleLike = async () => {
@@ -198,7 +173,7 @@ const PostCard = ({ post, onDelete }) => {
               className="w-11 h-11 rounded-full ring-2 ring-purple-200 mr-3 object-cover"
             />
             <div>
-              <p className="font-semibold text-primary">
+              <p className="font-semibold text-purple-700">
                 {post.author?.name || "Anonymous"}
               </p>
               <p className="text-xs text-gray-500">
@@ -212,7 +187,7 @@ const PostCard = ({ post, onDelete }) => {
             </div>
           </button>
           <div className="ml-auto flex items-center gap-2">
-            <button className="text-primary text-sm font-semibold hover:underline">
+            <button className="text-purple-700 text-sm font-semibold hover:underline">
               + Follow
             </button>
           </div>
@@ -238,7 +213,7 @@ const PostCard = ({ post, onDelete }) => {
             {post.tags.map((tag, idx) => (
               <span
                 key={idx}
-                className="bg-purple-100 text-primary text-xs px-3 py-1 rounded-full font-medium"
+                className="bg-purple-100 text-purple-700 text-xs px-3 py-1 rounded-full font-medium"
               >
                 #{tag}
               </span>
@@ -297,21 +272,21 @@ const PostCard = ({ post, onDelete }) => {
         )}
 
         {/* Actions */}
-        <div className="flex justify-between items-center pt-4 mt-4 border-t border-purple-100 text-sm text-primary">
+        <div className="flex justify-between items-center pt-4 mt-4 border-t border-purple-100 text-sm text-purple-700">
           <button
             onClick={toggleLike}
             disabled={loading}
-            className="flex items-center gap-1 font-medium hover:text-primary disabled:opacity-50"
+            className="flex items-center gap-1 font-medium hover:text-purple-700 disabled:opacity-50"
           >
             <span className="text-lg transition-transform hover:scale-110">
-              {liked ? <FaThumbsUp className="text-primary" /> : <FiThumbsUp />}
+              {liked ? <FaThumbsUp className="text-purple-700" /> : <FiThumbsUp />}
             </span>
             Like {likeCount > 0 && `(${likeCount})`}
           </button>
 
           <button
             onClick={() => setShowComments(!showComments)}
-            className="flex items-center gap-1 font-medium hover:text-primary transition"
+            className="flex items-center gap-1 font-medium hover:text-purple-700 transition"
           >
             <span className="text-lg group-hover:scale-110 transition-transform">
               <FiMessageCircle />
@@ -399,10 +374,6 @@ const PostCard = ({ post, onDelete }) => {
         )}
       </div>
 
-      {/* User profile popup */}
-      {showProfile && selectedUser && (
-        <UserProfilePopup user={selectedUser} onClose={closeProfile} />
-      )}
     </>
   );
 };
@@ -612,7 +583,7 @@ const RecursiveCommentItem = ({
 const ActionButton = ({ icon, label, onClick }) => (
   <button
     onClick={onClick}
-    className="flex items-center gap-1 font-medium hover:text-primary transition"
+    className="flex items-center gap-1 font-medium hover:text-purple-700 transition"
   >
     <span className="text-lg group-hover:scale-110 transition-transform">
       {icon}

@@ -6,6 +6,7 @@ const Sidebar = ({
   onSelectUser,
   onNewConversation,
   onDeleteConversation,
+  selectedChat,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -123,7 +124,7 @@ const Sidebar = ({
           </div>
         ) : (
           chats.map((chat) => (
-            <div key={chat.id} className="chat-card">
+            <div key={chat.id} className={`chat-card ${selectedChat?.id === chat.id ? 'selected' : ''}`}>
               <div
                 className="chat-card-content"
                 onClick={() => onSelectUser(chat)}

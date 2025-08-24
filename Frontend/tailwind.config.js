@@ -6,10 +6,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#800080', // 🎯 Custom purple
+        primary: '#800080', // Custom purple
       },
       borderRadius: {
-        xl2: '18px', // Custom radius
+        xl2: '18px',
       },
       fontFamily: {
         sans: ['Poppins', 'sans-serif'],
@@ -17,6 +17,6 @@ module.exports = {
     },
   },
   plugins: [
-    require('tailwind-scrollbar-hide'), // 👈 Add this line
+    require('tailwind-scrollbar-hide'),
   ],
 };

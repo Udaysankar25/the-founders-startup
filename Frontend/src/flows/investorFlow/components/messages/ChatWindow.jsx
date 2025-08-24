@@ -24,6 +24,32 @@ const ChatWindow = ({ chat }) => {
     });
   };
 
+  const handleSendFile = (file) => {
+    const newMsg = {
+      id: Date.now(),
+      sender: 'me',
+      type: 'file',
+      fileName: file.name,
+      fileSize: file.size,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setMessages(prev => [...prev, newMsg]);
+  };
+
+  const handleSendImage = (file) => {
+    const newMsg = {
+      id: Date.now(),
+      sender: 'me',
+      type: 'image',
+      imageUrl: URL.createObjectURL(file),
+      fileName: file.name,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setMessages(prev => [...prev, newMsg]);
+  };
+
   useEffect(() => {
     socket.on('receive-message', (msg) => {
       setMessages(prev => [...prev, msg]);
@@ -35,6 +61,9 @@ const ChatWindow = ({ chat }) => {
   return (
     <div className="chat-window">
       <ChatHeader name={chat.name} avatar={chat.avatar} />
+      
+
+
       <div className="messages-list">
         {messages.map((msg) => (
           <MessageBubble
@@ -43,10 +72,18 @@ const ChatWindow = ({ chat }) => {
             text={msg.text}
             timestamp={msg.timestamp}
             avatar={chat.avatar}
+            type={msg.type}
+            fileName={msg.fileName}
+            fileSize={msg.fileSize}
+            imageUrl={msg.imageUrl}
           />
         ))}
       </div>
-      <MessageInput onSend={handleSend} />
+      <MessageInput 
+        onSend={handleSend} 
+        onSendFile={handleSendFile}
+        onSendImage={handleSendImage}
+      />
     </div>
   );
 };

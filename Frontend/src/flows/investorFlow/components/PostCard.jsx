@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   FiThumbsUp,
   FiMessageCircle,
@@ -9,6 +10,7 @@ import { FaThumbsUp } from 'react-icons/fa';
 
 const PostCard = ({ post }) => {
   const [liked, setLiked] = useState(false);
+  const navigate = useNavigate();
 
   const toggleLike = () => setLiked(prev => !prev);
 
@@ -31,6 +33,11 @@ const PostCard = ({ post }) => {
     }
   };
 
+  // Navigate to user profile page
+  const openUserProfile = () => {
+    navigate(`/investor/dashboard/user/${post.id}`);
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-lg mb-6 p-6 border border-purple-100 transition hover:shadow-xl duration-300">
       
@@ -39,13 +46,19 @@ const PostCard = ({ post }) => {
         <img
           src={post.avatar}
           alt={post.name}
-          className="w-11 h-11 rounded-full ring-2 ring-purple-200 mr-3 object-cover"
+          className="w-11 h-11 rounded-full ring-2 ring-purple-200 mr-3 object-cover cursor-pointer hover:ring-purple-400 transition-all"
+          onClick={openUserProfile}
         />
-        <div>
-          <p className="font-semibold text-primary">{post.name}</p>
+        <div className="flex-1">
+          <p 
+            className="font-semibold text-purple-700 cursor-pointer hover:underline"
+            onClick={openUserProfile}
+          >
+            {post.name}
+          </p>
           <p className="text-xs text-gray-500">{post.time}</p>
         </div>
-        <button className="ml-auto text-primary text-sm font-semibold hover:underline">
+        <button className="ml-auto text-purple-700 text-sm font-semibold hover:underline">
           + Follow
         </button>
       </div>
@@ -70,7 +83,7 @@ const PostCard = ({ post }) => {
           {post.tags.map((tag, idx) => (
             <span
               key={idx}
-              className="bg-purple-100 text-primary text-xs px-3 py-1 rounded-full font-medium"
+              className="bg-purple-100 text-purple-700 text-xs px-3 py-1 rounded-full font-medium"
             >
               #{tag}
             </span>
@@ -88,33 +101,32 @@ const PostCard = ({ post }) => {
       )}
 
       {/* Actions */}
-      <div className="flex justify-between items-center pt-4 mt-4 border-t border-purple-100 text-sm text-primary">
+      <div className="flex justify-between items-center pt-4 mt-4 border-t border-purple-100 text-sm text-purple-700">
         <button
           onClick={toggleLike}
-          className="flex items-center gap-1 font-medium hover:text-primary"
+          className="flex items-center gap-1 font-medium hover:text-purple-800"
         >
           <span className="text-lg transition-transform hover:scale-110">
-            {liked ? <FaThumbsUp className="text-primary" /> : <FiThumbsUp />}
+            {liked ? <FaThumbsUp className="text-purple-700" /> : <FiThumbsUp />}
           </span>
           Like
         </button>
 
-        <ActionButton icon={<FiMessageCircle />} label="Comment" />
-        <ActionButton icon={<FiShare2 />} label="Share" onClick={handleShare} />
-        <ActionButton icon={<FiTrendingUp />} label="Invest" />
+        <button className="flex items-center gap-1 font-medium hover:text-purple-800">
+          <FiMessageCircle className="text-lg" />
+          Comment
+        </button>
+
+        <button
+          onClick={handleShare}
+          className="flex items-center gap-1 font-medium hover:text-purple-800"
+        >
+          <FiShare2 className="text-lg" />
+          Share
+        </button>
       </div>
     </div>
   );
 };
-
-const ActionButton = ({ icon, label, onClick }) => (
-  <button
-    onClick={onClick}
-    className="flex items-center gap-1 font-medium hover:text-primary transition"
-  >
-    <span className="text-lg group-hover:scale-110 transition-transform">{icon}</span>
-    {label}
-  </button>
-);
 
 export default PostCard;
