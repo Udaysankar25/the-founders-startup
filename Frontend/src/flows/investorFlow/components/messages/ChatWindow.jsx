@@ -4,7 +4,7 @@ import ChatHeader from './ChatHeader';
 import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
 
-const ChatWindow = ({ chat }) => {
+const ChatWindow = ({ chat, onBack }) => {
   const [messages, setMessages] = useState(chat.messages || []);
 
   const handleSend = (text) => {
@@ -58,13 +58,16 @@ const ChatWindow = ({ chat }) => {
     return () => socket.off('receive-message');
   }, []);
 
-  return (
-    <div className="chat-window">
+return (
+    <div className="chat-window flex flex-col h-full">
+      {/* Back button on mobile */}
+      <div className="md:hidden p-2 border-b">
+        <button onClick={onBack} className="text-primary text-sm">&larr; Back</button>
+      </div>
+
       <ChatHeader name={chat.name} avatar={chat.avatar} />
-      
 
-
-      <div className="messages-list">
+      <div className="messages-list flex-1 overflow-y-auto">
         {messages.map((msg) => (
           <MessageBubble
             key={msg.id}
@@ -79,6 +82,7 @@ const ChatWindow = ({ chat }) => {
           />
         ))}
       </div>
+
       <MessageInput 
         onSend={handleSend} 
         onSendFile={handleSendFile}
@@ -87,5 +91,6 @@ const ChatWindow = ({ chat }) => {
     </div>
   );
 };
+
 
 export default ChatWindow;

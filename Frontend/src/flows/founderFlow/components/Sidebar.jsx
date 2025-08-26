@@ -23,7 +23,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="md:flex w-[80px] bg-[#f4eaff] py-6 flex-col items-center gap-6 shadow-inner fixed top-[72px] left-0 h-[calc(100vh-72px)] z-30">
+      <aside className="hidden md:flex w-[80px] bg-[#f4eaff] py-6 flex-col items-center gap-6 shadow-inner fixed top-[72px] left-0 h-[calc(100vh-72px)] z-30">
         {menu.map((item, idx) =>
           item.path === '#' ? (
             <button

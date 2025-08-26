@@ -422,9 +422,7 @@
   background-color: #fff;
 }
 
-.hidden {
-  display: none;
-}
+
 
 /* 📌 Pinned Message */
 .pinned-message {
@@ -545,4 +543,29 @@
 
 .download-btn:hover {
   background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* Mobile layout fix */
+@media (max-width: 768px) {
+  .chat-layout {
+    flex-direction: column;
+    padding: 0;
+  }
+
+  .sidebar-wrapper {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .chat-panel {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  /* Hide/show handled by React class toggling */
+  .chat-hidden {
+    display: none !important;
+  }
 }

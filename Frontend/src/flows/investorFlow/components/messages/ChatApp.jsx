@@ -33,15 +33,11 @@ const ChatApp = ({ initialUser }) => {
   const [selectedChat, setSelectedChat] = useState(null);
 
   useEffect(() => {
-    // If we have an initial user, find or create a chat for them
     if (initialUser) {
-      // Check if chat already exists
       const existingChat = mockChats.find(chat => chat.id === initialUser.id);
-      
       if (existingChat) {
         setSelectedChat(existingChat);
       } else {
-        // Create a new chat for this user
         const newChat = {
           id: initialUser.id,
           name: initialUser.name,
@@ -60,26 +56,34 @@ const ChatApp = ({ initialUser }) => {
     setSelectedChat(chat);
   };
 
+  const handleBack = () => {
+    setSelectedChat(null);
+  };
+
   return (
     <div className="chat-app-wrapper">
-      <div className="chat-layout">
-        <div className="sidebar-wrapper">
-          <Sidebar chats={mockChats} onSelectUser={handleUserSelect} selectedChat={selectedChat} />
-        </div>
+     <div className="chat-layout">
+  {/* Sidebar */}
+  <div className={`sidebar-wrapper ${selectedChat ? 'chat-hidden md:flex' : 'block'}`}>
+    <Sidebar chats={mockChats} onSelectUser={handleUserSelect} selectedChat={selectedChat} />
+  </div>
 
-        <div className="chat-panel">
-          {selectedChat ? (
-            <ChatWindow chat={selectedChat} />
-          ) : (
-            <div className="empty-chat-window">
-              <p>Select a conversation to start chatting</p>
-            </div>
-          )}
-        </div>
+  {/* Chat Panel */}
+  <div className={`chat-panel ${selectedChat ? 'block' : 'chat-hidden md:flex'}`}>
+    {selectedChat ? (
+      <ChatWindow chat={selectedChat} onBack={() => setSelectedChat(null)} />
+    ) : (
+      <div className="empty-chat-window">
+        <p>Select a conversation to start chatting</p>
       </div>
+    )}
+  </div>
+</div>
+
     </div>
   );
 };
+
 
 export default ChatApp;
 
